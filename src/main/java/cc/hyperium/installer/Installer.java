@@ -1,6 +1,7 @@
 package cc.hyperium.installer;
 
 import cc.hyperium.installer.steps.InstallerStep;
+import cc.hyperium.installer.steps.SettingsScreen;
 import cc.hyperium.installer.steps.WelcomeScreen;
 import cc.hyperium.utils.Colors;
 import org.slf4j.Logger;
@@ -24,19 +25,22 @@ public class Installer {
     private Queue<InstallerStep> steps = new ArrayDeque<>();
     private Logger logger = LoggerFactory.getLogger("Installer");
     private JFrame frame;
+    private Font title;
     private Font font;
 
     private void init() {
         logger.info("Starting installer...");
         steps.addAll(Arrays.asList(
-                new WelcomeScreen()
+                new WelcomeScreen(),
+                new SettingsScreen()
         ));
         try {
-            font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(12f);
+            font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(15f);
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
-            font = new Font("Arial", Font.PLAIN, 12); //Fallback
+            font = new Font("Arial", Font.PLAIN, 15); //Fallback
         }
+        title = font.deriveFont(50f);
         logger.info("Initialing frame...");
         SwingUtilities.invokeLater(() -> {
             try {
@@ -73,8 +77,12 @@ public class Installer {
     public void next() {
         if (steps.isEmpty()) return;
         InstallerStep step = steps.poll();
-        step.modifyFrame(frame);
-        step.addComponents(frame.getContentPane());
+        SwingUtilities.invokeLater(() -> {
+            frame.getContentPane().removeAll();
+            step.modifyFrame(frame);
+            step.addComponents(frame.getContentPane());
+            frame.repaint();
+        });
     }
 
     public JFrame getFrame() {
@@ -83,5 +91,9 @@ public class Installer {
 
     public Font getFont() {
         return font;
+    }
+
+    public Font getTitle() {
+        return title;
     }
 }

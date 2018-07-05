@@ -15,13 +15,13 @@ public abstract class InstallerStep {
     public void addComponents(Container c) {
         MotionPanel mp = new MotionPanel(Installer.INSTANCE.getFrame());
         mp.setBackground(Colors.DARK.brighter());
-        mp.setLayout(new BorderLayout());
+        mp.setLayout(null);
         FlatButton fb = new FlatButton();
         fb.setText("X");
-        fb.setSize(50, 20);
+        fb.setBounds(c.getWidth() - 50, 0, 50, 20);
         fb.addActionListener(e -> System.exit(0));
 
-        mp.add(fb, BorderLayout.EAST);
+        mp.add(fb);
         mp.setBounds(0, 0, c.getWidth(), 20);
         c.add(mp);
     }

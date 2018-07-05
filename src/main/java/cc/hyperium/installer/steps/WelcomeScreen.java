@@ -1,6 +1,7 @@
 package cc.hyperium.installer.steps;
 
 import cc.hyperium.installer.Installer;
+import cc.hyperium.installer.components.FlatButton;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -25,11 +26,17 @@ public class WelcomeScreen extends InstallerStep {
         icon.setBounds(c.getWidth() / 2 - w / 2, w / 4, w, w);
 
         JLabel text = new JLabel("Hyperium Installer", SwingConstants.CENTER);
-        text.setFont(Installer.INSTANCE.getFont().deriveFont(50f));
+        text.setFont(Installer.INSTANCE.getTitle());
         text.setForeground(Color.WHITE);
         text.setBounds(0, w / 4 + w + 10, c.getWidth(), 60);
 
+        JButton next = new FlatButton();
+        next.setText("Next");
+        next.setBounds(c.getWidth() / 2 - 50, c.getHeight() - 40, 100, 22);
+        next.addActionListener(e -> Installer.INSTANCE.next());
+
         c.add(icon);
         c.add(text);
+        c.add(next);
     }
 }
