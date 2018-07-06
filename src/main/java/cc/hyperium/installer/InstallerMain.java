@@ -3,6 +3,7 @@ package cc.hyperium.installer;
 import cc.hyperium.installer.api.entities.InstallerConfig;
 import cc.hyperium.installer.steps.InstallerStep;
 import cc.hyperium.installer.steps.SettingsScreen;
+import cc.hyperium.installer.steps.VersionScreen;
 import cc.hyperium.installer.steps.WelcomeScreen;
 import cc.hyperium.utils.Colors;
 import com.google.gson.Gson;
@@ -50,7 +51,8 @@ public class InstallerMain {
         logger.info("Starting installer...");
         steps.addAll(Arrays.asList(
                 new WelcomeScreen(),
-                new SettingsScreen()
+                new SettingsScreen(),
+                new VersionScreen()
         ));
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(15f);
