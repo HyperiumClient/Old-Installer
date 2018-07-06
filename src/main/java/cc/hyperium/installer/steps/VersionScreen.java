@@ -9,6 +9,7 @@ import cc.hyperium.utils.Colors;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxUI;
 import java.awt.*;
 import java.io.IOException;
 
@@ -41,6 +42,7 @@ public class VersionScreen extends InstallerStep {
 
         JComboBox<String> versions = new JComboBox<>();
         versions.setFont(InstallerMain.INSTANCE.getFont());
+        versions.setUI(new BasicComboBoxUI());
         versions.addItem("Release B16");
         versions.addItem("Release B15");
         versions.setBounds(c.getWidth() / 2 - tw / 2, c.getHeight() / 2 + 5, 250, 20);
