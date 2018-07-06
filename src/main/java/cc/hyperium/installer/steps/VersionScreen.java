@@ -1,6 +1,6 @@
 package cc.hyperium.installer.steps;
 
-import java.awt.*;
+import java.awt.Container;
 
 /*
  * Created by Cubxity on 06/07/2018

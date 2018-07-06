@@ -1,6 +1,6 @@
 package cc.hyperium.utils;
 
-import java.awt.*;
+import java.awt.Color;
 
 /*
  * Created by Cubxity on 05/07/2018
