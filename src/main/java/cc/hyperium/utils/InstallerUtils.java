@@ -8,12 +8,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.util.Locale;
 
 /*
  * Created by Cubxity on 06/07/2018
  */
 public class InstallerUtils {
+    public static final long ONE_GIBIBYTE = 1073741824L;
     private static HttpClient client = HttpClients.createDefault();
     private static InstallerManifest manifest;
     private static OSType os;
@@ -64,4 +66,13 @@ public class InstallerUtils {
             manifest = new Gson().fromJson(get("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/installer/versions.json").getObject(), InstallerManifest.class);
         return manifest;
     }
+
+    public static long getTotalPhysicalMemorySize() {
+        try {
+            return ((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize();
+        } catch (ClassCastException e) {
+            return ONE_GIBIBYTE * 8;
+        }
+    }
+
 }

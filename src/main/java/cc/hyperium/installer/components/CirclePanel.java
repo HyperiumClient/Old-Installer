@@ -1,7 +1,10 @@
 package cc.hyperium.installer.components;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 /*
  * Created by Cubxity on 06/07/2018

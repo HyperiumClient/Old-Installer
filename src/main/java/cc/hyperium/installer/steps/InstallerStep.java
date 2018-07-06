@@ -5,8 +5,8 @@ import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.MotionPanel;
 import cc.hyperium.utils.Colors;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import java.awt.Container;
 
 /*
  * Created by Cubxity on 05/07/2018

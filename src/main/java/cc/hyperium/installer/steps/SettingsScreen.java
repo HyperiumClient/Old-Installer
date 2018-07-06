@@ -4,13 +4,24 @@ import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.installer.components.CirclePanel;
 import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.SliderUI;
+import cc.hyperium.utils.InstallerUtils;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 
 /*
  * Created by Cubxity on 05/07/2018
@@ -49,10 +60,14 @@ public class SettingsScreen extends InstallerStep {
         wamText.setBounds(w / 3, w / 2 + 20, w / 3, 14);
         wam.add(wamText);
 
+        BigDecimal totalPhysicalMemory = new BigDecimal(InstallerUtils.getTotalPhysicalMemorySize());
+        BigDecimal oneGibibyte = new BigDecimal(InstallerUtils.ONE_GIBIBYTE);
+        BigDecimal physicalMemoryInGibibytes = totalPhysicalMemory.divide(oneGibibyte, BigDecimal.ROUND_HALF_UP);
+
         JSlider wamSlider = new JSlider();
         wamSlider.setUI(new SliderUI(wamSlider));
         wamSlider.setMinimum(1);
-        wamSlider.setMaximum(8);
+        wamSlider.setMaximum(physicalMemoryInGibibytes.intValue());
         wamSlider.setValue(InstallerMain.INSTANCE.getConfig().getWam());
         wamSlider.setBounds(20, w / 2 - 10, w - 40, 20);
         wamSlider.setBackground(Color.WHITE);

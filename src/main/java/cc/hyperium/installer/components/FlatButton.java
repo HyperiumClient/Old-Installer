@@ -3,8 +3,8 @@ package cc.hyperium.installer.components;
 import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.utils.Colors;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
