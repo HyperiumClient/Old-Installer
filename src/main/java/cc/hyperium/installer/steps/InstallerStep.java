@@ -1,6 +1,6 @@
 package cc.hyperium.installer.steps;
 
-import cc.hyperium.installer.Installer;
+import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.MotionPanel;
 import cc.hyperium.utils.Colors;
@@ -13,7 +13,7 @@ import java.awt.*;
  */
 public abstract class InstallerStep {
     public void addComponents(Container c) {
-        MotionPanel mp = new MotionPanel(Installer.INSTANCE.getFrame());
+        MotionPanel mp = new MotionPanel(InstallerMain.INSTANCE.getFrame());
         mp.setBackground(Colors.DARK.brighter());
         mp.setLayout(null);
         FlatButton fb = new FlatButton();

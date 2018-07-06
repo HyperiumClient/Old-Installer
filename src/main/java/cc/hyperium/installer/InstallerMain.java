@@ -1,9 +1,11 @@
 package cc.hyperium.installer;
 
+import cc.hyperium.installer.api.entities.InstallerConfig;
 import cc.hyperium.installer.steps.InstallerStep;
 import cc.hyperium.installer.steps.SettingsScreen;
 import cc.hyperium.installer.steps.WelcomeScreen;
 import cc.hyperium.utils.Colors;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +13,10 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Queue;
@@ -19,16 +24,29 @@ import java.util.Queue;
 /*
  * Created by Cubxity on 05/07/2018
  */
-public class Installer {
-    public static final Installer INSTANCE = new Installer();
+public class InstallerMain {
+    public static final InstallerMain INSTANCE = new InstallerMain();
 
     private Queue<InstallerStep> steps = new ArrayDeque<>();
     private Logger logger = LoggerFactory.getLogger("Installer");
+    private InstallerConfig config;
     private JFrame frame;
     private Font title;
     private Font font;
 
     private void init() {
+        logger.info("Loading previous settings...");
+        File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
+        if (prev.exists())
+            try {
+                config = new Gson().fromJson(new String(Files.readAllBytes(prev.toPath()), Charset.defaultCharset()), InstallerConfig.class);
+            } catch (Exception ex) {
+                logger.error("Failed to load previous installer config", ex);
+                config = new InstallerConfig();
+            }
+        else
+            config = new InstallerConfig();
+
         logger.info("Starting installer...");
         steps.addAll(Arrays.asList(
                 new WelcomeScreen(),
@@ -95,5 +113,9 @@ public class Installer {
 
     public Font getTitle() {
         return title;
+    }
+
+    public InstallerConfig getConfig() {
+        return config;
     }
 }
