@@ -11,6 +11,7 @@ import cc.hyperium.utils.InstallerUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxUI;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
@@ -44,6 +45,7 @@ public class VersionScreen extends InstallerStep {
 
         JComboBox<String> versions = new JComboBox<>();
         versions.setFont(InstallerMain.INSTANCE.getFont());
+        versions.setUI(new BasicComboBoxUI());
 
         Arrays.stream(InstallerUtils.getManifest().getVersions()).filter(vm -> vm.getTargetInstaller() <= Installer.API_VERSION)
                 .forEach(vm -> versions.addItem(vm.getName()));
