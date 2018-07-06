@@ -6,6 +6,8 @@ import cc.hyperium.installer.steps.SettingsScreen;
 import cc.hyperium.installer.steps.VersionScreen;
 import cc.hyperium.installer.steps.WelcomeScreen;
 import cc.hyperium.utils.Colors;
+import cc.hyperium.utils.InstallerUtils;
+import cc.hyperium.utils.Multithreading;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,9 @@ public class InstallerMain {
     private Font font;
 
     private void init() {
+        logger.info("Loading launcher manifest asynchronously...");
+        Multithreading.runAsync(InstallerUtils::getManifest);
+
         logger.info("Loading previous settings...");
         File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
         if (prev.exists())
