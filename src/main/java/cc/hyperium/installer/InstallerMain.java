@@ -1,10 +1,7 @@
 package cc.hyperium.installer;
 
 import cc.hyperium.installer.api.entities.InstallerConfig;
-import cc.hyperium.installer.steps.InstallerStep;
-import cc.hyperium.installer.steps.SettingsScreen;
-import cc.hyperium.installer.steps.VersionScreen;
-import cc.hyperium.installer.steps.WelcomeScreen;
+import cc.hyperium.installer.steps.*;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
 import cc.hyperium.utils.Multithreading;
@@ -23,6 +20,7 @@ import java.nio.file.Files;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
  * Created by Cubxity on 05/07/2018
@@ -38,8 +36,15 @@ public class InstallerMain {
     private Font font;
 
     private void init() {
+        AtomicBoolean pass = new AtomicBoolean(false);
         logger.info("Loading launcher manifest asynchronously...");
-        Multithreading.runAsync(InstallerUtils::getManifest);
+        Multithreading.runAsync(() -> {
+            InstallerUtils.getManifest();
+            if (frame != null && frame.getContentPane().getComponents().length == 2)
+                next();
+            else
+                pass.set(true);
+        });
 
         logger.info("Loading previous settings...");
         File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
@@ -55,6 +60,7 @@ public class InstallerMain {
 
         logger.info("Starting installer...");
         steps.addAll(Arrays.asList(
+                new LoadingStep(),
                 new WelcomeScreen(),
                 new SettingsScreen(),
                 new VersionScreen()
@@ -92,6 +98,8 @@ public class InstallerMain {
             frame.setVisible(true);
 
             next();
+            if(pass.get())
+                next();
         });
     }
 

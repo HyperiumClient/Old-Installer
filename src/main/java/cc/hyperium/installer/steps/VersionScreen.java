@@ -1,17 +1,20 @@
 package cc.hyperium.installer.steps;
 
 import cc.hyperium.installer.InstallerMain;
+import cc.hyperium.installer.api.Installer;
 import cc.hyperium.installer.components.ComboBoxEditor;
 import cc.hyperium.installer.components.ComboBoxRenderer;
 import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.FlatRadioButton;
 import cc.hyperium.utils.Colors;
+import cc.hyperium.utils.InstallerUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import java.awt.*;
 import java.io.IOException;
+import java.util.Arrays;
 
 /*
  * Created by Cubxity on 06/07/2018
@@ -43,8 +46,10 @@ public class VersionScreen extends InstallerStep {
         JComboBox<String> versions = new JComboBox<>();
         versions.setFont(InstallerMain.INSTANCE.getFont());
         versions.setUI(new BasicComboBoxUI());
-        versions.addItem("Release B16");
-        versions.addItem("Release B15");
+
+        Arrays.stream(InstallerUtils.getManifest().getVersions()).filter(vm -> vm.getTargetInstaller() <= Installer.API_VERSION)
+                .forEach(vm -> versions.addItem(vm.getName()));
+
         versions.setBounds(c.getWidth() / 2 - tw / 2, c.getHeight() / 2 + 5, 250, 20);
         versions.setBackground(Colors.DARK.brighter());
         versions.setForeground(Color.WHITE);
