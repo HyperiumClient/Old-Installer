@@ -1,6 +1,27 @@
 package cc.hyperium.installer.api;
 
+import cc.hyperium.installer.InstallerMain;
+import cc.hyperium.installer.api.callbacks.AbstractCallback;
+import cc.hyperium.installer.api.callbacks.ErrorCallback;
+import cc.hyperium.installer.api.callbacks.Phrase;
+import cc.hyperium.installer.api.callbacks.StatusCallback;
 import cc.hyperium.installer.api.entities.InstallerConfig;
+import cc.hyperium.utils.DownloadTask;
+import cc.hyperium.utils.InstallerUtils;
+import cc.hyperium.utils.JsonHolder;
+import com.google.gson.JsonArray;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /*
  * Created by Cubxity on 06/07/2018
@@ -10,9 +31,217 @@ public class Installer {
 
     private InstallerConfig config;
 
-    public Installer(InstallerConfig config) {
+    private Consumer<AbstractCallback> callback;
+
+    private int code = 1;
+
+    public Installer(InstallerConfig config, Consumer<AbstractCallback> callback) {
         this.config = config;
+        this.callback = callback;
     }
 
+    public void install() {
+        Phrase phrase = Phrase.PRE;
+        String sep = File.separator;
 
+        try {
+            System.setProperty("http.agent", "Mozilla/5.0 Hyperium Installer");
+            callback.accept(new StatusCallback(phrase, "Running pre checks", null));
+            File mc = new File(config.getDir());
+            if (!mc.exists() || mc.isFile()) {
+                callback.accept(new ErrorCallback(new IllegalStateException("Invalid Minecraft directory"), phrase, "Invalid Minecraft directory"));
+                return;
+            }
+
+            File versions = new File(mc, "versions");
+            File origin = new File(versions, "1.8.9");
+            File originJson = new File(origin, "1.8.9.json");
+            File originJar = new File(origin, "1.8.9.jar");
+
+            if (!origin.exists() || !originJson.exists() || !originJar.exists()) {
+                callback.accept(new ErrorCallback(new IllegalStateException("Version '1.8.9' does not exist"), phrase, "Version '1.8.9' does not exist, make sure to play it at least once"));
+                return;
+            }
+
+            File target = new File(versions, "Hyperium 1.8.9");
+            File libraries = new File(mc, "libraries");
+            if (target.exists())
+                try {
+                    callback.accept(new StatusCallback(phrase, "Deleting previous json", null));
+                    new File(target, "Hyperium 1.8.9.json").delete();
+                } catch (Exception ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to delete the old json, is the game running?"));
+                    return;
+                }
+
+
+            if (config.getVersion().getName().equals("LOCAL")) {
+                phrase = Phrase.COPY_VERSION;
+                //TODO: Finish this
+            } else {
+                try {
+                    File hyperium = new File(mc, "libraries" + sep + "cc" + sep + "hyperium" + sep + "Hyperium");
+                    if (hyperium.exists())
+                        FileUtils.deleteDirectory(hyperium);
+                } catch (IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to delete old Hyperium libraries"));
+                }
+                phrase = Phrase.DOWNLOAD_CLIENT;
+                File downloaded;
+                try {
+                    List<String> sp = Arrays.asList(config.getVersion().getPath().split("/"));
+                    File dir = new File(libraries, sp.subList(0, sp.size() - 1).stream().collect(Collectors.joining(sep)));
+                    InstallerMain.INSTANCE.getLogger().debug("Target directory: {}", dir.getAbsolutePath());
+                    dir.mkdirs();
+
+                    DownloadTask dl = new DownloadTask(config.getVersion().getUrl(), dir.getAbsolutePath());
+                    dl.addPropertyChangeListener(evt -> callback.accept(new StatusCallback(Phrase.DOWNLOAD_CLIENT, evt.getNewValue() + "% Downloaded", null)));
+                    dl.execute();
+                    dl.get();
+                    downloaded = new File(dir, dl.getFileName());
+                    InstallerMain.INSTANCE.getLogger().debug("Downloaded file: {}", downloaded.getAbsolutePath());
+                } catch (Exception ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to download the client: " + ex.getMessage()));
+                    return;
+                }
+
+                phrase = Phrase.VERIFY_CLIENT;
+
+                callback.accept(new StatusCallback(phrase, "Verifying client", null));
+                String hash;
+                hash = InstallerUtils.toHex(InstallerUtils.checksum(downloaded, "SHA-256")).toLowerCase();
+                InstallerMain.INSTANCE.getLogger().debug("SHA256 Hash = {}, Expected {}", hash, config.getVersion().getSha256());
+                if (!hash.equals(config.getVersion().getSha256())) {
+                    callback.accept(new ErrorCallback(new IllegalStateException("SHA256 Hash does not match"), phrase, "Failed to verify the downloaded file, please try again."));
+                    return;
+                }
+                hash = InstallerUtils.toHex(InstallerUtils.checksum(downloaded, "SHA1")).toLowerCase();
+                InstallerMain.INSTANCE.getLogger().debug("SHA1 Hash = {}, Expected {}", hash, config.getVersion().getSha1());
+                if (!hash.equals(config.getVersion().getSha1())) {
+                    callback.accept(new ErrorCallback(new IllegalStateException("SHA1 Hash does not match"), phrase, "Failed to verify the downloaded file, please try again."));
+                    return;
+                }
+            }
+
+            File optifine = null;
+            boolean of = Arrays.stream(config.getComponents()).anyMatch(cm -> cm.getName().equals("Optifine"));
+            if (of) {
+                phrase = Phrase.DOWNLOAD_COMPONENTS;
+                callback.accept(new StatusCallback(phrase, "Downloading Optifine", null));
+                File tmpDir = Files.createTempDirectory("Hyperium").toFile();
+                try {
+                    DownloadTask dl = new DownloadTask("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/files/mods/OptiFine_1.8.9_HD_U_I7.jar", tmpDir.getAbsolutePath());
+                    dl.addPropertyChangeListener(evt -> callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, evt.getNewValue() + "% Downloaded", null)));
+                    dl.execute();
+                    dl.get();
+                    optifine = new File(tmpDir, dl.getFileName());
+                } catch (Exception ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to download Optifine: " + ex.getMessage()));
+                }
+            }
+
+            phrase = Phrase.COPY_VERSION;
+            File targetJson = new File(target, "Hyperium 1.8.9.json");
+            File targetJar = new File(target, "Hyperium 1.8.9.jar");
+            try {
+                target.mkdir();
+                FileUtils.copyFile(originJson, targetJson);
+                FileUtils.copyFile(originJar, targetJar);
+            } catch (IOException ex) {
+                callback.accept(new ErrorCallback(ex, phrase, "Failed to copy files: " + ex.getMessage()));
+                return;
+            }
+
+            if (of) {
+                phrase = Phrase.PATCH_OPTIFINE;
+                callback.accept(new StatusCallback(phrase, "Downloading Optifine", null));
+                File optifineLibDir = new File(libraries, sep + "optifine" + sep + "OptiFine" + sep + "1.8.9_HD_U_I7");
+                optifineLibDir.mkdirs();
+                File optifineLib = new File(optifineLibDir, "OptiFine-1.8.9_HD_U_I7.jar");
+                ProcessBuilder builder = new ProcessBuilder("java", "-cp", optifine.getAbsolutePath(), "optifine.Patcher", originJar.getAbsolutePath(), optifine.getAbsolutePath(), optifineLib.getAbsolutePath());
+                builder.inheritIO();
+                builder.redirectErrorStream(true);
+                Process proc;
+                try {
+                    proc = builder.start();
+                    int c;
+                    if ((c = proc.waitFor()) != 0)
+                        throw new IOException("Failed to patch Optifine, process exited with code " + c);
+                } catch (InterruptedException | IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to patch Optifine"));
+                    return;
+                }
+                optifine.delete();
+            }
+
+            //TODO: Install addon and remove old addons has same name as the one we're going to install
+
+            phrase = Phrase.CREATE_PROFILE;
+            callback.accept(new StatusCallback(phrase, "Running pre checks", null));
+            JsonHolder json;
+            JsonHolder launcherProfiles;
+            try {
+                json = new JsonHolder(com.google.common.io.Files.toString(targetJson, Charset.defaultCharset()));
+                launcherProfiles = new JsonHolder(com.google.common.io.Files.toString(new File(mc, "launcher_profiles.json"), Charset.defaultCharset()));
+            } catch (IOException ex) {
+                callback.accept(new ErrorCallback(ex, phrase, "Failed to read profile"));
+                return;
+            }
+            JsonHolder lib = new JsonHolder();
+            lib.put("name", config.getVersion().getName().equals("LOCAL") ? "cc.hyperium:Hyperium:LOCAL" : config.getVersion().getArtifactId());
+            JsonArray libs = json.optJSONArray("libraries");
+            libs.add(lib.getObject());
+            libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:1.7").getObject());
+            if (of)
+                libs.add(new JsonHolder().put("name", "optifine:OptiFine:1.8.9_HD_U_I7").getObject());
+            json.put("libraries", libs);
+            json.put("id", "Hyperium 1.8.9");
+            json.put("mainClass", "net.minecraft.launchwrapper.Launch");
+            json.put("minecraftArguments", json.optString("minecraftArguments") + " --tweakClass=" + (config.getVersion().getName().equals("LOCAL") ? "cc.hyperium.launch.HyperiumTweaker" : config.getVersion().getTweaker()));
+
+            JsonHolder profiles = launcherProfiles.optJSONObject("profiles");
+            Instant instant = Instant.ofEpochMilli(System.currentTimeMillis());
+            String installedUUID = UUID.randomUUID().toString();
+            for (String key : profiles.getKeys()) {
+                if (profiles.optJSONObject(key).has("name"))
+                    if (profiles.optJSONObject(key).optString("name").equals("Hyperium 1.8.9"))
+                        installedUUID = key;
+            }
+            JsonHolder profile = new JsonHolder()
+                    .put("name", "Hyperium 1.8.9")
+                    .put("type", "custom")
+                    .put("created", instant.toString())
+                    .put("lastUsed", instant.toString())
+                    .put("lastVersionId", "Hyperium 1.8.9")
+                    .put("javaArgs", "-Xms512M -Xmx" + config.getWam() + "G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=16M -XX:+DisableExplicitGC")
+                    .put("icon", InstallerUtils.ICON_BASE64);
+            if (config.getLocalJre())
+                if (System.getProperty("java.version").startsWith("1.8"))
+                    if (System.getProperty("sun.arch.data.model", "").equalsIgnoreCase("64")) {
+                        File file = new File(System.getProperty("java.home"), "bin/java" + (InstallerUtils.getOS() == InstallerUtils.OSType.Windows ? "w.exe" : ""));
+                        if (file.exists())
+                            profile.put("javaDir", file.getAbsolutePath());
+                        else System.out.println(file.getAbsolutePath());
+                    }
+            profiles.put(installedUUID, profile);
+            launcherProfiles.put("profiles", profiles);
+
+            try {
+                com.google.common.io.Files.write(json.toString(), targetJson, Charset.defaultCharset());
+                com.google.common.io.Files.write(launcherProfiles.toString(), new File(mc, "launcher_profiles.json"), Charset.defaultCharset());
+            } catch (IOException ex) {
+                callback.accept(new ErrorCallback(ex, phrase, "Failed to write profile"));
+                return;
+            }
+
+            phrase = Phrase.DONE;
+            code = 0;
+        } catch (Exception ex) {
+            callback.accept(new ErrorCallback(ex, phrase));
+        }
+    }
+
+    public int getCode() {
+        return code;
+    }
 }

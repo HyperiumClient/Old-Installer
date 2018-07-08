@@ -64,7 +64,7 @@ public class VersionScreen extends InstallerStep {
 
         c.add(text);
         c.add(icon);
-        c.add(beta);
+        // c.add(beta);
         c.add(versions);
         c.add(next);
     }

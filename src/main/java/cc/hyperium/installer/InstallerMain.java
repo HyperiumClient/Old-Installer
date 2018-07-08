@@ -63,7 +63,9 @@ public class InstallerMain {
                 new LoadingStep(),
                 new WelcomeScreen(),
                 new SettingsScreen(),
-                new VersionScreen()
+                new VersionScreen(),
+                new AddonsScreen(),
+                new InstallingScreen()
         ));
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(15f);
@@ -132,5 +134,9 @@ public class InstallerMain {
 
     public InstallerConfig getConfig() {
         return config;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 }
