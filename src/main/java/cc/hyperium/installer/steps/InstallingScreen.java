@@ -23,12 +23,13 @@ public class InstallingScreen extends InstallerStep {
         JPanel panel = new MotionPanel(InstallerMain.INSTANCE.getFrame());
         panel.setBounds(0, 0, c.getWidth(), c.getHeight());
         panel.setBackground(Colors.DARK);
+        panel.setLayout(null);
         c.add(panel);
 
         JLabel title = new JLabel("Starting installation...", JLabel.CENTER);
-        title.setFont(InstallerMain.INSTANCE.getTitle());
+        title.setFont(InstallerMain.INSTANCE.getTitle().deriveFont(25f));
         title.setForeground(Color.WHITE);
-        title.setBounds(0, c.getHeight() / 3 * 2, c.getWidth(), 65);
+        title.setBounds(0, panel.getHeight() / 5 * 4, panel.getWidth(), 40);
 
         panel.add(title);
 

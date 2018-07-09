@@ -6,6 +6,8 @@ import cc.hyperium.installer.api.callbacks.ErrorCallback;
 import cc.hyperium.installer.api.callbacks.Phrase;
 import cc.hyperium.installer.api.callbacks.StatusCallback;
 import cc.hyperium.installer.api.entities.InstallerConfig;
+import cc.hyperium.installer.api.entities.internal.AddonManifest;
+import cc.hyperium.installer.api.entities.internal.AddonManifestParser;
 import cc.hyperium.utils.DownloadTask;
 import cc.hyperium.utils.InstallerUtils;
 import cc.hyperium.utils.JsonHolder;
@@ -17,10 +19,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 /*
@@ -95,7 +96,10 @@ public class Installer {
                     dir.mkdirs();
 
                     DownloadTask dl = new DownloadTask(config.getVersion().getUrl(), dir.getAbsolutePath());
-                    dl.addPropertyChangeListener(evt -> callback.accept(new StatusCallback(Phrase.DOWNLOAD_CLIENT, evt.getNewValue() + "% Downloaded", null)));
+                    dl.addPropertyChangeListener(evt -> {
+                        if (evt.getNewValue() instanceof Integer)
+                            callback.accept(new StatusCallback(Phrase.DOWNLOAD_CLIENT, evt.getNewValue() + "% Downloaded", null));
+                    });
                     dl.execute();
                     dl.get();
                     downloaded = new File(dir, dl.getFileName());
@@ -124,14 +128,17 @@ public class Installer {
             }
 
             File optifine = null;
-            boolean of = Arrays.stream(config.getComponents()).anyMatch(cm -> cm.getName().equals("Optifine"));
+            boolean of = config.getComponents().stream().anyMatch(c -> c.equals("Optifine"));
             if (of) {
                 phrase = Phrase.DOWNLOAD_COMPONENTS;
                 callback.accept(new StatusCallback(phrase, "Downloading Optifine", null));
                 File tmpDir = Files.createTempDirectory("Hyperium").toFile();
                 try {
                     DownloadTask dl = new DownloadTask("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/files/mods/OptiFine_1.8.9_HD_U_I7.jar", tmpDir.getAbsolutePath());
-                    dl.addPropertyChangeListener(evt -> callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, evt.getNewValue() + "% Downloaded", null)));
+                    dl.addPropertyChangeListener(evt -> {
+                        if (evt.getNewValue() instanceof Integer)
+                            callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, evt.getNewValue() + "% Downloaded", null));
+                    });
                     dl.execute();
                     dl.get();
                     optifine = new File(tmpDir, dl.getFileName());
@@ -154,7 +161,7 @@ public class Installer {
 
             if (of) {
                 phrase = Phrase.PATCH_OPTIFINE;
-                callback.accept(new StatusCallback(phrase, "Downloading Optifine", null));
+                callback.accept(new StatusCallback(phrase, "Patching Optifine", null));
                 File optifineLibDir = new File(libraries, sep + "optifine" + sep + "OptiFine" + sep + "1.8.9_HD_U_I7");
                 optifineLibDir.mkdirs();
                 File optifineLib = new File(optifineLibDir, "OptiFine-1.8.9_HD_U_I7.jar");
@@ -174,7 +181,60 @@ public class Installer {
                 optifine.delete();
             }
 
-            //TODO: Install addon and remove old addons has same name as the one we're going to install
+            phrase = Phrase.DOWNLOAD_COMPONENTS;
+            Map<File, AddonManifest> installedAddons = new HashMap<>();
+            File addonsDir = new File(mc, "addons");
+            if (addonsDir.exists()) {
+                File[] files = addonsDir.listFiles((dir, name) -> name.endsWith(".jar"));
+                if (files != null)
+                    for (File a : files) {
+                        try {
+                            installedAddons.put(a, new AddonManifestParser(new JarFile(a)).getAddonManifest());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+            } else addonsDir.mkdirs();
+            try {
+                List<cc.hyperium.installer.api.entities.AddonManifest> addons = Arrays.asList(InstallerUtils.getManifest().getAddons());
+                for (String cm : config.getComponents()) {
+                    if (cm.equals("Optifine")) continue;
+                    Optional<cc.hyperium.installer.api.entities.AddonManifest> oa = addons.stream().filter(a -> a.getName().equals(cm)).findFirst();
+                    if (!oa.isPresent()) {
+                        InstallerMain.INSTANCE.getLogger().warn("Addon not found: {}", cm);
+                        continue;
+                    }
+                    cc.hyperium.installer.api.entities.AddonManifest addon = oa.get();
+                    installedAddons.forEach((f, m) -> {
+                        if (m.getName() != null)
+                            if (m.getName().equals(addon.getName()))
+                                if (!f.delete())
+                                    InstallerMain.INSTANCE.getLogger().warn("Failed to delete {}", f.getAbsolutePath());
+                    });
+                    try {
+                        phrase = Phrase.DOWNLOAD_COMPONENTS;
+                        InstallerMain.INSTANCE.getLogger().info("Downloading {}", addon.getUrl());
+                        DownloadTask dl = new DownloadTask(addon.getUrl(), addonsDir.getAbsolutePath());
+                        dl.addPropertyChangeListener(evt -> {
+                            if (evt.getNewValue() instanceof Integer)
+                                callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, "Downloading " + addon.getName() + " (" + evt.getNewValue() + "%)", addon));
+                        });
+                        dl.execute();
+                        dl.get();
+                        phrase = Phrase.VERIFY_COMPONENTS;
+                        if (!InstallerUtils.toHex(InstallerUtils.checksum(new File(addonsDir, dl.getFileName()), "SHA-256")).equalsIgnoreCase(addon.getSha256())) {
+                            callback.accept(new ErrorCallback(new IllegalStateException("Component's checksum does not match"), phrase, addon.getName() + "'s checksum does not match"));
+                            return;
+                        }
+                    } catch (Exception ex) {
+                        callback.accept(new ErrorCallback(ex, phrase, "Failed to download " + addon.getName() + ", " + ex.getMessage()));
+                        return;
+                    }
+                }
+            } catch (Exception ex) {
+                callback.accept(new ErrorCallback(ex, phrase));
+                return;
+            }
 
             phrase = Phrase.CREATE_PROFILE;
             callback.accept(new StatusCallback(phrase, "Running pre checks", null));
@@ -218,10 +278,11 @@ public class Installer {
             if (config.getLocalJre())
                 if (System.getProperty("java.version").startsWith("1.8"))
                     if (System.getProperty("sun.arch.data.model", "").equalsIgnoreCase("64")) {
-                        File file = new File(System.getProperty("java.home"), "bin/java" + (InstallerUtils.getOS() == InstallerUtils.OSType.Windows ? "w.exe" : ""));
+                        File file = new File(System.getProperty("java.home"), "bin" + sep + "java" + (InstallerUtils.getOS() == InstallerUtils.OSType.Windows ? "w.exe" : ""));
                         if (file.exists())
                             profile.put("javaDir", file.getAbsolutePath());
-                        else System.out.println(file.getAbsolutePath());
+                        else
+                            InstallerMain.INSTANCE.getLogger().debug("Local JRE path does not exist, path = {}", file.getAbsolutePath());
                     }
             profiles.put(installedUUID, profile);
             launcherProfiles.put("profiles", profiles);

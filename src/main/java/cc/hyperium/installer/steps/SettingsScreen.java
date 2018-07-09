@@ -44,7 +44,7 @@ public class SettingsScreen extends InstallerStep {
             e.printStackTrace();
         }
 
-        JLabel wamText = new JLabel("1GB", JLabel.CENTER);
+        JLabel wamText = new JLabel(InstallerMain.INSTANCE.getConfig().getWam() + "GB", JLabel.CENTER);
         wamText.setFont(InstallerMain.INSTANCE.getFont());
         wamText.setBounds(w / 3, w / 2 + 20, w / 3, 14);
         wam.add(wamText);
@@ -57,6 +57,7 @@ public class SettingsScreen extends InstallerStep {
         wamSlider.setBounds(20, w / 2 - 10, w - 40, 20);
         wamSlider.setBackground(Color.WHITE);
         wamSlider.addChangeListener(e -> {
+            InstallerMain.INSTANCE.getConfig().setWam(wamSlider.getValue());
             wamText.setText(wamSlider.getValue() + "GB");
             wam.repaint();
         });

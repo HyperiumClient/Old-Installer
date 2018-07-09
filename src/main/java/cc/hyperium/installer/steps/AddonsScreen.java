@@ -2,7 +2,7 @@ package cc.hyperium.installer.steps;
 
 import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.installer.api.entities.AddonManifest;
-import cc.hyperium.installer.api.entities.ComponentManifest;
+import cc.hyperium.installer.api.entities.InstallerConfig;
 import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.FlatRadioButton;
 import cc.hyperium.installer.components.HScrollBarUI;
@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /*
  * Created by Cubxity on 08/07/2018
@@ -85,6 +86,14 @@ public class AddonsScreen extends InstallerStep {
                         "It allows Minecraft to run faster and look better with full support for HD textures and many configuration options.");
             }
         });
+        InstallerConfig ic = InstallerMain.INSTANCE.getConfig();
+        of.addActionListener(e -> {
+            if (of.isSelected() && !ic.getComponents().contains("Optifine"))
+                ic.getComponents().add("Optifine");
+            else if (!of.isSelected())
+                ic.getComponents().remove("Optifine");
+        });
+        of.setSelected(InstallerMain.INSTANCE.getConfig().getComponents().stream().anyMatch(cm -> cm.equals("Optifine")));
         cView.add(of);
 
         try {
@@ -113,6 +122,12 @@ public class AddonsScreen extends InstallerStep {
                 rb.setVerticalAlignment(SwingConstants.TOP);
                 rb.setHorizontalAlignment(SwingConstants.LEFT);
                 rb.setBackground(Colors.DARK.brighter());
+                rb.addActionListener(e -> {
+                    if (rb.isSelected() && !ic.getComponents().contains(a))
+                        ic.getComponents().add(a.getName());
+                    else if (!rb.isSelected())
+                        ic.getComponents().remove(a.getName());
+                });
                 dependencies.put(rb, a.getDepends());
                 cView.add(rb);
             }
@@ -121,8 +136,8 @@ public class AddonsScreen extends InstallerStep {
             e.printStackTrace();
         }
 
-        ComponentManifest[] comps = InstallerMain.INSTANCE.getConfig().getComponents();
-        dependencies.keySet().forEach(rb -> rb.setSelected(Arrays.stream(comps).anyMatch(cm -> cm.getName().equals(rb.getText()))));
+        List<String> comps = InstallerMain.INSTANCE.getConfig().getComponents();
+        dependencies.keySet().forEach(rb -> rb.setSelected(comps.stream().anyMatch(cm -> cm.equals(rb.getText()))));
 
         JButton install = new FlatButton();
         install.setText("Install");

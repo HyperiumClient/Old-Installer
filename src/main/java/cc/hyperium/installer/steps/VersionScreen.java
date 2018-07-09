@@ -24,6 +24,8 @@ public class VersionScreen extends InstallerStep {
     public void addComponents(Container c) {
         super.addComponents(c);
 
+        InstallerMain.INSTANCE.getConfig().setVersion(InstallerUtils.getManifest().getVersions()[InstallerUtils.getManifest().getVersions().length - 1]);
+
         int tw = c.getFontMetrics(InstallerMain.INSTANCE.getFont()).stringWidth("Select version");
         int w = Math.min(c.getHeight() / 3, 1080);
 
