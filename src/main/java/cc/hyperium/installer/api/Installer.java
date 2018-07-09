@@ -137,7 +137,7 @@ public class Installer {
                     DownloadTask dl = new DownloadTask("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/files/mods/OptiFine_1.8.9_HD_U_I7.jar", tmpDir.getAbsolutePath());
                     dl.addPropertyChangeListener(evt -> {
                         if (evt.getNewValue() instanceof Integer)
-                            callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, evt.getNewValue() + "% Downloaded", null));
+                            callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, "Downloading Optifine (" + evt.getNewValue() + "%)", null));
                     });
                     dl.execute();
                     dl.get();

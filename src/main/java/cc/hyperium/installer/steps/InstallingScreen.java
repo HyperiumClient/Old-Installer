@@ -56,7 +56,8 @@ public class InstallingScreen extends InstallerStep {
             try {
                 in.install();
                 InstallerMain.INSTANCE.getLogger().info("Installation finished with code {}", in.getCode());
-                title.setText("Installation success");
+                if(in.getCode() == 0)
+                    title.setText("Installation success");
                 super.addComponents(panel);
                 InstallerMain.INSTANCE.getFrame().repaint();
             } catch (Exception ex) {

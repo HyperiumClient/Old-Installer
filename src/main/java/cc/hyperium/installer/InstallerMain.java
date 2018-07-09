@@ -65,6 +65,7 @@ public class InstallerMain {
                 new SettingsScreen(),
                 new VersionScreen(),
                 new AddonsScreen(),
+                new TOSScreen(),
                 new InstallingScreen()
         ));
         try {

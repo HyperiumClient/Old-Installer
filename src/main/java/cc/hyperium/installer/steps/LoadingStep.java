@@ -16,7 +16,7 @@ public class LoadingStep extends InstallerStep {
         JLabel label = new JLabel("Loading manifest...", JLabel.CENTER);
         label.setFont(InstallerMain.INSTANCE.getTitle());
         label.setForeground(Color.WHITE);
-        label.setBounds(0, c.getHeight() / 2 - 25, c.getWidth(), 50);
+        label.setBounds(0, c.getHeight() / 2 - 25, c.getWidth(), 60);
         c.add(label);
     }
 }

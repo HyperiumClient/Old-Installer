@@ -9,6 +9,7 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Locale;
@@ -57,11 +58,15 @@ public class InstallerUtils {
 
     public static JsonHolder get(String url) {
         try {
-            return new JsonHolder(IOUtils.toString(client.execute(new HttpGet(url)).getEntity().getContent()));
+            return new JsonHolder(getRaw(url));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new JsonHolder();
+    }
+
+    public static String getRaw(String url) throws IOException {
+        return IOUtils.toString(client.execute(new HttpGet(url)).getEntity().getContent());
     }
 
     public static InstallerManifest getManifest() {
