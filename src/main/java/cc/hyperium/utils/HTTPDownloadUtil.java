@@ -21,8 +21,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HTTPDownloadUtil {
+
+    private static final Pattern FILENAME = Pattern.compile("filename=(?<name>\\S+)");
 
     private HttpURLConnection httpConn;
 
@@ -59,13 +63,12 @@ public class HTTPDownloadUtil {
             contentLength = httpConn.getContentLength();
 
             if (disposition != null) {
-                // extracts file name from header field
-                int index = disposition.indexOf("filename=");
-                if (index > 0) {
-                    fileName = disposition.substring(index + 10,
-                            disposition.length() - 1);
-                }
-            } else {
+                Matcher m = FILENAME.matcher(disposition);
+                if (m.find())
+                    fileName = m.group("name");
+            }
+
+            if (fileName == null) {
                 // extracts file name from URL
                 fileName = fileURL.substring(fileURL.lastIndexOf("/") + 1,
                         fileURL.length());
