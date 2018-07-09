@@ -40,6 +40,8 @@ public class TOSScreen extends InstallerStep {
                 "\n" +
                 "The data is stored securely for analytic purposes. We will never sell or release the data collected from specific users. All analytic graphs may be viewed on sk1er.club/graphs/hyperium\n" +
                 "Last updated: March 17th, 2018\n");
+        essay.setLineWrap(true);
+        essay.setWrapStyleWord(true);
         essay.setFont(InstallerMain.INSTANCE.getFont());
         essay.setForeground(new Color(250, 250, 250));
         essay.setBackground(Colors.DARK.brighter());
