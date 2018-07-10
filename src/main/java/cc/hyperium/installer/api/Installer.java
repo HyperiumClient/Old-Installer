@@ -68,10 +68,11 @@ public class Installer {
             File libraries = new File(mc, "libraries");
             if (target.exists())
                 try {
-                    callback.accept(new StatusCallback(phrase, "Deleting previous json", null));
-                    new File(target, "Hyperium 1.8.9.json").delete();
+                    callback.accept(new StatusCallback(phrase, "Deleting previous files", null));
+                    FileUtils.deleteDirectory(target);
+
                 } catch (Exception ex) {
-                    callback.accept(new ErrorCallback(ex, phrase, "Failed to delete the old json, is the game running?"));
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to delete the old files, is the game running?"));
                     return;
                 }
 

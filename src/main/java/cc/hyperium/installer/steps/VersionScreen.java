@@ -24,7 +24,7 @@ public class VersionScreen extends InstallerStep {
     public void addComponents(Container c) {
         super.addComponents(c);
 
-        InstallerMain.INSTANCE.getConfig().setVersion(InstallerUtils.getManifest().getVersions()[InstallerUtils.getManifest().getVersions().length - 1]);
+        InstallerMain.INSTANCE.getConfig().setVersion(InstallerUtils.getManifest().getVersions()[0]);
 
         int tw = c.getFontMetrics(InstallerMain.INSTANCE.getFont()).stringWidth("Select version");
         int w = Math.min(c.getHeight() / 3, 1080);
@@ -52,6 +52,8 @@ public class VersionScreen extends InstallerStep {
         Arrays.stream(InstallerUtils.getManifest().getVersions()).filter(vm -> vm.getTargetInstaller() <= Installer.API_VERSION)
                 .forEach(vm -> versions.addItem(vm.getName()));
 
+        versions.setSelectedItem(InstallerMain.INSTANCE.getConfig().getVersion().getName());
+        versions.addActionListener(e -> InstallerMain.INSTANCE.getConfig().setVersion(Arrays.stream(InstallerUtils.getManifest().getVersions()).filter(v -> v.getName().equals(versions.getSelectedItem())).findFirst().get()));
         versions.setBounds(c.getWidth() / 2 - tw / 2, c.getHeight() / 2 + 5, 250, 20);
         versions.setBackground(Colors.DARK.brighter());
         versions.setForeground(Color.WHITE);
