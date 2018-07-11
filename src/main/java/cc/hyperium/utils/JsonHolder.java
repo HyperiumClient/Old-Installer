@@ -238,8 +238,9 @@ public class JsonHolder {
         return this;
     }
 
-    public void put(String blacklisted, JsonArray jsonElements) {
-        this.object.add(blacklisted, jsonElements);
+    public JsonHolder put(String key, JsonArray value) {
+        this.object.add(key, value);
+        return this;
     }
 
     public void remove(String header) {

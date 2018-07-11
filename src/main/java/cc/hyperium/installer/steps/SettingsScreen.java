@@ -86,7 +86,7 @@ public class SettingsScreen extends InstallerStep {
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             chooser.setAcceptAllFileFilterUsed(false);
             if (chooser.showOpenDialog(InstallerMain.INSTANCE.getFrame()) == JFileChooser.APPROVE_OPTION)
-                InstallerMain.INSTANCE.getConfig().setDir(chooser.getCurrentDirectory().getAbsolutePath());
+                InstallerMain.INSTANCE.getConfig().setDir(chooser.getSelectedFile().getAbsolutePath());
             try {
                 UIManager.setLookAndFeel(new MetalLookAndFeel());
             } catch (Exception ignored) {

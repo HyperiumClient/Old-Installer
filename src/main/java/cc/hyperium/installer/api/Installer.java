@@ -15,6 +15,8 @@ import com.google.gson.JsonArray;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
@@ -55,19 +57,25 @@ public class Installer {
                 return;
             }
 
-            File versions = new File(mc, "versions");
-            File origin = new File(versions, "1.8.9");
-            File originJson = new File(origin, "1.8.9.json");
-            File originJar = new File(origin, "1.8.9.jar");
+            boolean mmc = new File(mc, "multimc.cfg").exists();
 
-            if (!origin.exists() || !originJson.exists() || !originJar.exists()) {
+            InstallerMain.INSTANCE.getLogger().debug("MC Dir = {}", mc.getAbsolutePath());
+            InstallerMain.INSTANCE.getLogger().debug("MultiMC = {}", mmc);
+
+            File versions = new File(mc, mmc ? "instances" : "versions");
+            File origin = mmc ? new File(mc, "libraries" + sep + "com" + sep + "mojang" + sep + "minecraft" + sep + "1.8.9") : new File(versions, "1.8.9");
+            File originJson = new File(origin, "1.8.9.json");
+            File originJar = new File(origin, mmc ? "minecraft-1.8.9-client.jar" : "1.8.9.jar");
+
+            if (mmc ? (!origin.exists() || !originJar.exists()) : (!origin.exists() || !originJson.exists() || !originJar.exists())) {
                 callback.accept(new ErrorCallback(new IllegalStateException("Version '1.8.9' does not exist"), phrase, "Version '1.8.9' does not exist, make sure to play it at least once"));
                 return;
             }
 
             File target = new File(versions, "Hyperium 1.8.9");
+
             File libraries = new File(mc, "libraries");
-            if (target.exists())
+            if (!mmc && target.exists())
                 try {
                     callback.accept(new StatusCallback(phrase, "Deleting previous files", null));
                     FileUtils.deleteDirectory(target);
@@ -149,16 +157,18 @@ public class Installer {
                 }
             }
 
-            phrase = Phrase.COPY_VERSION;
             File targetJson = new File(target, "Hyperium 1.8.9.json");
             File targetJar = new File(target, "Hyperium 1.8.9.jar");
-            try {
-                target.mkdir();
-                FileUtils.copyFile(originJson, targetJson);
-                FileUtils.copyFile(originJar, targetJar);
-            } catch (IOException ex) {
-                callback.accept(new ErrorCallback(ex, phrase, "Failed to copy files: " + ex.getMessage()));
-                return;
+            target.mkdir();
+            if (!mmc) {
+                phrase = Phrase.COPY_VERSION;
+                try {
+                    FileUtils.copyFile(originJson, targetJson);
+                    FileUtils.copyFile(originJar, targetJar);
+                } catch (IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to copy files: " + ex.getMessage()));
+                    return;
+                }
             }
 
             if (of) {
@@ -183,7 +193,7 @@ public class Installer {
 
             phrase = Phrase.DOWNLOAD_COMPONENTS;
             Map<File, AddonManifest> installedAddons = new HashMap<>();
-            File addonsDir = new File(mc, "addons");
+            File addonsDir = new File(mmc ? target : mc, mmc ? ".minecraft" + sep : "" + "addons");
             if (addonsDir.exists()) {
                 File[] files = addonsDir.listFiles((dir, name) -> name.endsWith(".jar"));
                 if (files != null)
@@ -237,62 +247,178 @@ public class Installer {
             }
 
             phrase = Phrase.CREATE_PROFILE;
-            callback.accept(new StatusCallback(phrase, "Running pre checks", null));
-            JsonHolder json;
-            JsonHolder launcherProfiles;
-            try {
-                json = new JsonHolder(com.google.common.io.Files.toString(targetJson, Charset.defaultCharset()));
-                launcherProfiles = new JsonHolder(com.google.common.io.Files.toString(new File(mc, "launcher_profiles.json"), Charset.defaultCharset()));
-            } catch (IOException ex) {
-                callback.accept(new ErrorCallback(ex, phrase, "Failed to read profile"));
-                return;
-            }
-            JsonHolder lib = new JsonHolder();
-            lib.put("name", config.getVersion().getName().equals("LOCAL") ? "cc.hyperium:Hyperium:LOCAL" : config.getVersion().getArtifactId());
-            JsonArray libs = json.optJSONArray("libraries");
-            libs.add(lib.getObject());
-            libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:1.7").getObject());
-            if (of)
-                libs.add(new JsonHolder().put("name", "optifine:OptiFine:1.8.9_HD_U_I7").getObject());
-            json.put("libraries", libs);
-            json.put("id", "Hyperium 1.8.9");
-            json.put("mainClass", "net.minecraft.launchwrapper.Launch");
-            json.put("minecraftArguments", json.optString("minecraftArguments") + " --tweakClass=" + (config.getVersion().getName().equals("LOCAL") ? "cc.hyperium.launch.HyperiumTweaker" : config.getVersion().getTweaker()));
-
-            JsonHolder profiles = launcherProfiles.optJSONObject("profiles");
-            Instant instant = Instant.ofEpochMilli(System.currentTimeMillis());
-            String installedUUID = UUID.randomUUID().toString();
-            for (String key : profiles.getKeys()) {
-                if (profiles.optJSONObject(key).has("name"))
-                    if (profiles.optJSONObject(key).optString("name").equals("Hyperium 1.8.9"))
-                        installedUUID = key;
-            }
-            JsonHolder profile = new JsonHolder()
-                    .put("name", "Hyperium 1.8.9")
-                    .put("type", "custom")
-                    .put("created", instant.toString())
-                    .put("lastUsed", instant.toString())
-                    .put("lastVersionId", "Hyperium 1.8.9")
-                    .put("javaArgs", "-Xms512M -Xmx" + config.getWam() + "G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=16M -XX:+DisableExplicitGC")
-                    .put("icon", InstallerUtils.ICON_BASE64);
-            if (config.getLocalJre())
-                if (System.getProperty("java.version").startsWith("1.8"))
-                    if (System.getProperty("sun.arch.data.model", "").equalsIgnoreCase("64")) {
-                        File file = new File(System.getProperty("java.home"), "bin" + sep + "java" + (InstallerUtils.getOS() == InstallerUtils.OSType.Windows ? "w.exe" : ""));
-                        if (file.exists())
-                            profile.put("javaDir", file.getAbsolutePath());
-                        else
-                            InstallerMain.INSTANCE.getLogger().debug("Local JRE path does not exist, path = {}", file.getAbsolutePath());
+            callback.accept(new StatusCallback(phrase, "Creating profile", null));
+            if (mmc) {
+                File cfg = new File(target, "instance.cfg");
+                Properties prop = new Properties();
+                if (cfg.exists())
+                    try {
+                        prop.load(new FileReader(cfg));
+                    } catch (IOException ex) {
+                        callback.accept(new ErrorCallback(ex, phrase, "Failed to read instance.cfg"));
+                        return;
                     }
-            profiles.put(installedUUID, profile);
-            launcherProfiles.put("profiles", profiles);
+                prop.setProperty("name", "Hyperium 1.8.9");
+                prop.setProperty("InstanceType", "OneSix");
+                prop.setProperty("MaxMemAlloc", String.valueOf(config.getWam() * 1024));
+                prop.setProperty("MinMemAlloc", "512");
+                try {
+                    prop.store(new FileWriter(cfg), null);
+                } catch (IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to write instance.cfg"));
+                    return;
+                }
 
-            try {
-                com.google.common.io.Files.write(json.toString(), targetJson, Charset.defaultCharset());
-                com.google.common.io.Files.write(launcherProfiles.toString(), new File(mc, "launcher_profiles.json"), Charset.defaultCharset());
-            } catch (IOException ex) {
-                callback.accept(new ErrorCallback(ex, phrase, "Failed to write profile"));
-                return;
+                File pack = new File(target, "mmc-pack.json");
+                JsonHolder packJson;
+                try {
+                    packJson = pack.exists() ? new JsonHolder(com.google.common.io.Files.toString(pack, Charset.defaultCharset())) : new JsonHolder();
+                } catch (IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to read mmc-pack.json"));
+                    return;
+                }
+                JsonArray components = new JsonArray();
+                components.add(
+                        new JsonHolder()
+                                .put("cachedName", "LWJGL 2")
+                                .put("cachedVersion", "2.9.4-nightly-20150209")
+                                .put("cachedVolatile", true)
+                                .put("dependencyOnly", true)
+                                .put("uid", "org.lwjgl")
+                                .put("version", "2.9.4-nightly-20150209")
+                                .getObject()
+                );
+                JsonArray cr = new JsonArray();
+                cr.add(
+                        new JsonHolder()
+                                .put("suggests", "2.9.4-nightly-20150209")
+                                .put("uid", "org.lwjgl")
+                                .getObject()
+                );
+                components.add(
+                        new JsonHolder()
+                                .put("cachedName", "Minecraft")
+                                .put("cachedRequires", cr)
+                                .put("cachedVersion", "1.8.9")
+                                .put("important", true)
+                                .put("uid", "net.minecraft")
+                                .put("version", "1.8.9")
+                                .getObject()
+                );
+                components.add(
+                        new JsonHolder()
+                                .put("uid", "cc.hyperium")
+                                .put("cachedName", "Hyperium")
+                                .put("cachedVersion", "0.17")
+                                .getObject()
+                );
+                packJson.put("components", components);
+                packJson.put("formatVersion", 1);
+                try {
+                    com.google.common.io.Files.write(packJson.toString(), pack, Charset.defaultCharset());
+                } catch (IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to write mmc-pack.json"));
+                    return;
+                }
+
+                File patches = new File(target, "patches");
+                patches.mkdir();
+
+                JsonHolder hyperiumJson = new JsonHolder();
+                JsonArray tweakers = new JsonArray();
+                tweakers.add(config.getVersion().getTweaker());
+                hyperiumJson.put("+tweakers", tweakers);
+
+                JsonArray libs = new JsonArray();
+                libs.add(
+                        new JsonHolder()
+                                .put("name", config.getVersion().getArtifactId())
+                                .put("MMC-hint", "local")
+                                .getObject()
+                );
+                libs.add(
+                        new JsonHolder()
+                                .put("name", "net.minecraft:launchwrapper:1.7")
+                                .getObject()
+                );
+                if (of)
+                    libs.add(
+                            new JsonHolder()
+                                    .put("name", "optifine:OptiFine:1.8.9_HD_U_I7")
+                                    .put("MMC-hint", "local")
+                                    .getObject()
+                    );
+                hyperiumJson.put("libraries", libs);
+                hyperiumJson.put("mainClass", "net.minecraft.launchwrapper.Launch");
+                hyperiumJson.put("name", "Hyperium");
+                hyperiumJson.put("version", config.getVersion().getName());
+                hyperiumJson.put("uid", "cc.hyperium");
+                hyperiumJson.put("formatVersion", 1);
+
+                try {
+                    com.google.common.io.Files.write(hyperiumJson.toString(), new File(patches, "cc.hyperium.json"), Charset.defaultCharset());
+                } catch (IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to write cc.hyperium.json"));
+                    return;
+                }
+
+            } else {
+                JsonHolder json;
+                JsonHolder launcherProfiles;
+                try {
+                    json = new JsonHolder(com.google.common.io.Files.toString(targetJson, Charset.defaultCharset()));
+                    launcherProfiles = new JsonHolder(com.google.common.io.Files.toString(new File(mc, "launcher_profiles.json"), Charset.defaultCharset()));
+                } catch (IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to read profile"));
+                    return;
+                }
+                JsonHolder lib = new JsonHolder();
+                lib.put("name", config.getVersion().getName().equals("LOCAL") ? "cc.hyperium:Hyperium:LOCAL" : config.getVersion().getArtifactId());
+                JsonArray libs = json.optJSONArray("libraries");
+                libs.add(lib.getObject());
+                libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:1.7").getObject());
+                if (of)
+                    libs.add(new JsonHolder().put("name", "optifine:OptiFine:1.8.9_HD_U_I7").getObject());
+                json.put("libraries", libs);
+                json.put("id", "Hyperium 1.8.9");
+                json.put("mainClass", "net.minecraft.launchwrapper.Launch");
+                json.put("minecraftArguments", json.optString("minecraftArguments") + " --tweakClass=" + (config.getVersion().getName().equals("LOCAL") ? "cc.hyperium.launch.HyperiumTweaker" : config.getVersion().getTweaker()));
+
+                JsonHolder profiles = launcherProfiles.optJSONObject("profiles");
+                Instant instant = Instant.ofEpochMilli(System.currentTimeMillis());
+                String installedUUID = UUID.randomUUID().toString();
+                for (String key : profiles.getKeys()) {
+                    if (profiles.optJSONObject(key).has("name"))
+                        if (profiles.optJSONObject(key).optString("name").equals("Hyperium 1.8.9"))
+                            installedUUID = key;
+                }
+                JsonHolder profile = new JsonHolder()
+                        .put("name", "Hyperium 1.8.9")
+                        .put("type", "custom")
+                        .put("created", instant.toString())
+                        .put("lastUsed", instant.toString())
+                        .put("lastVersionId", "Hyperium 1.8.9")
+                        .put("javaArgs", "-Xms512M -Xmx" + config.getWam() + "G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=16M -XX:+DisableExplicitGC")
+                        .put("icon", InstallerUtils.ICON_BASE64);
+                if (config.getLocalJre())
+                    if (System.getProperty("java.version").startsWith("1.8"))
+                        if (System.getProperty("sun.arch.data.model", "").equalsIgnoreCase("64")) {
+                            File file = new File(System.getProperty("java.home"), "bin" + sep + "java" + (InstallerUtils.getOS() == InstallerUtils.OSType.Windows ? "w.exe" : ""));
+                            if (file.exists())
+                                profile.put("javaDir", file.getAbsolutePath());
+                            else
+                                InstallerMain.INSTANCE.getLogger().debug("Local JRE path does not exist, path = {}", file.getAbsolutePath());
+                        }
+                profiles.put(installedUUID, profile);
+                launcherProfiles.put("profiles", profiles);
+
+                try {
+                    com.google.common.io.Files.write(json.toString(), targetJson, Charset.defaultCharset());
+                    com.google.common.io.Files.write(launcherProfiles.toString(), new File(mc, "launcher_profiles.json"), Charset.defaultCharset());
+                } catch (IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to write profile"));
+                    return;
+                }
             }
 
             phrase = Phrase.DONE;
