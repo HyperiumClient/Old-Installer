@@ -3,6 +3,7 @@ package cc.hyperium.installer.steps;
 import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.installer.api.Installer;
 import cc.hyperium.installer.api.callbacks.ErrorCallback;
+import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.MotionPanel;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.Multithreading;
@@ -10,6 +11,8 @@ import com.google.gson.Gson;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -36,8 +39,26 @@ public class InstallingScreen extends InstallerStep {
         blob.setBounds(panel.getWidth() / 2 - w / 2, panel.getHeight() / 2 - w / 2, w, w);
         blob.setSize(w, w);
 
+        w = panel.getHeight() / 10;
+        JButton log = new FlatButton();
+        log.setIcon(new ImageIcon(new ImageIcon(getClass().getResource("/icons/log.png")).getImage().getScaledInstance(w, w, Image.SCALE_DEFAULT)));
+        log.setBounds(panel.getWidth() - w, panel.getHeight() - w, w, w);
+        log.setBackground(Colors.DARK);
+        log.addActionListener(e -> {
+            try {
+                title.setText("Copying logs...");
+                Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+                cb.setContents(new StringSelection(InstallerMain.INSTANCE.getLog().toString()), null);
+                title.setText("Log was copied to the clipboard!");
+            } catch (Exception ex) {
+                InstallerMain.INSTANCE.getLogger().warn("Failed to copy log to the clipboard", ex);
+                title.setText("Failed to copy logs: " + ex.getMessage());
+            }
+        });
+
         panel.add(title);
         panel.add(blob);
+        panel.add(log);
 
         Multithreading.runAsync(() -> {
             try {
@@ -56,7 +77,7 @@ public class InstallingScreen extends InstallerStep {
             try {
                 in.install();
                 InstallerMain.INSTANCE.getLogger().info("Installation finished with code {}", in.getCode());
-                if(in.getCode() == 0)
+                if (in.getCode() == 0)
                     title.setText("Installation success");
                 super.addComponents(panel);
                 InstallerMain.INSTANCE.getFrame().repaint();
