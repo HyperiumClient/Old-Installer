@@ -1,5 +1,6 @@
 package cc.hyperium.utils;
 
+import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.installer.api.entities.InstallerManifest;
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
@@ -11,6 +12,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.security.MessageDigest;
 import java.util.Locale;
 
@@ -101,5 +106,11 @@ public class InstallerUtils {
         return r.toString();
     }
 
+    public static void loadURL(URL url) throws Exception {
+        URLClassLoader ucl = (URLClassLoader) InstallerMain.class.getClassLoader();
+        Method m = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+        m.setAccessible(true);
+        m.invoke(ucl, url);
+    }
 
 }

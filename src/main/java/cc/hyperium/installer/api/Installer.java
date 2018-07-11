@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.Instant;
@@ -161,22 +162,20 @@ public class Installer {
             }
 
             if (of) {
-                phrase = Phrase.PATCH_OPTIFINE;
-                callback.accept(new StatusCallback(phrase, "Patching Optifine", null));
-                File optifineLibDir = new File(libraries, sep + "optifine" + sep + "OptiFine" + sep + "1.8.9_HD_U_I7");
-                optifineLibDir.mkdirs();
-                File optifineLib = new File(optifineLibDir, "OptiFine-1.8.9_HD_U_I7.jar");
-                ProcessBuilder builder = new ProcessBuilder("java", "-cp", optifine.getAbsolutePath(), "optifine.Patcher", originJar.getAbsolutePath(), optifine.getAbsolutePath(), optifineLib.getAbsolutePath());
-                builder.inheritIO();
-                builder.redirectErrorStream(true);
-                Process proc;
                 try {
-                    proc = builder.start();
-                    int c;
-                    if ((c = proc.waitFor()) != 0)
-                        throw new IOException("Failed to patch Optifine, process exited with code " + c);
-                } catch (InterruptedException | IOException ex) {
-                    callback.accept(new ErrorCallback(ex, phrase, "Failed to patch Optifine"));
+                    phrase = Phrase.PATCH_OPTIFINE;
+                    callback.accept(new StatusCallback(phrase, "Patching Optifine", null));
+                    File optifineLibDir = new File(libraries, sep + "optifine" + sep + "OptiFine" + sep + "1.8.9_HD_U_I7");
+                    optifineLibDir.mkdirs();
+                    File optifineLib = new File(optifineLibDir, "OptiFine-1.8.9_HD_U_I7.jar");
+
+                    InstallerUtils.loadURL(optifine.toURI().toURL());
+
+                    Class<?> patcher = Class.forName("optifine.Patcher");
+                    Method main = patcher.getMethod("main", String[].class);
+                    main.invoke(null, new Object[]{new String[]{originJar.getAbsolutePath(), optifine.getAbsolutePath(), optifineLib.getAbsolutePath()}});
+                } catch (Exception ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to patch Optifine: " + ex.getMessage()));
                     return;
                 }
                 optifine.delete();
