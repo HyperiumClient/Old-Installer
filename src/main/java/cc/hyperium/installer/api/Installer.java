@@ -262,6 +262,7 @@ public class Installer {
                 prop.setProperty("InstanceType", "OneSix");
                 prop.setProperty("MaxMemAlloc", String.valueOf(config.getWam() * 1024));
                 prop.setProperty("MinMemAlloc", "512");
+                prop.setProperty("iconKey", "hyperium");
                 try {
                     prop.store(new FileWriter(cfg), null);
                 } catch (IOException ex) {
@@ -359,6 +360,15 @@ public class Installer {
                     com.google.common.io.Files.write(hyperiumJson.toString(), new File(patches, "cc.hyperium.json"), Charset.defaultCharset());
                 } catch (IOException ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to write cc.hyperium.json"));
+                    return;
+                }
+
+                File icons = new File(mc, "icons");
+                icons.mkdir();
+                try {
+                    com.google.common.io.Files.write(Base64.getDecoder().decode(InstallerUtils.ICON_BASE64.replace("data:image/png;base64,", "")), new File(icons, "hyperium.png"));
+                } catch (IOException ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to add hyperium icon"));
                     return;
                 }
 
