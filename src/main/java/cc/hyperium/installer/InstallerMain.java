@@ -15,6 +15,8 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayDeque;
@@ -30,12 +32,24 @@ public class InstallerMain {
 
     private Queue<InstallerStep> steps = new ArrayDeque<>();
     private Logger logger = LoggerFactory.getLogger("Installer");
+    private StringBuilder log = new StringBuilder();
     private InstallerConfig config;
     private JFrame frame;
     private Font title;
     private Font font;
 
     private void init() {
+        final PrintStream ps = System.out;
+        final PrintStream logStream = new PrintStream(new OutputStream() {
+            @Override
+            public void write(int b) {
+                ps.write(b);
+                log.append((char) b);
+            }
+        });
+        System.setOut(logStream);
+        System.setErr(logStream);
+
         AtomicBoolean pass = new AtomicBoolean(false);
         logger.info("Loading launcher manifest asynchronously...");
         Multithreading.runAsync(() -> {
@@ -101,7 +115,7 @@ public class InstallerMain {
             frame.setVisible(true);
 
             next();
-            if(pass.get())
+            if (pass.get())
                 next();
         });
     }
@@ -139,5 +153,9 @@ public class InstallerMain {
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public StringBuilder getLog() {
+        return log;
     }
 }
