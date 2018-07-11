@@ -193,7 +193,7 @@ public class Installer {
 
             phrase = Phrase.DOWNLOAD_COMPONENTS;
             Map<File, AddonManifest> installedAddons = new HashMap<>();
-            File addonsDir = new File(mmc ? target : mc, mmc ? ".minecraft" + sep : "" + "addons");
+            File addonsDir = new File(mmc ? target : mc, (mmc ? ".minecraft" + sep : "") + "addons");
             if (addonsDir.exists()) {
                 File[] files = addonsDir.listFiles((dir, name) -> name.endsWith(".jar"));
                 if (files != null)
