@@ -78,10 +78,6 @@ public class InstallingScreen extends InstallerStep {
                 in.install();
                 InstallerMain.INSTANCE.getLogger().info("Installation finished with code {}", in.getCode());
                 SwingUtilities.invokeLater(() -> {
-                    if (in.getCode() == 0)
-                        title.setText("Installation success");
-                    else
-                        title.setText("Installation failed with unknown issue. Please submit log to hyperium staff");
                     super.addComponents(panel);
                 });
                 InstallerMain.INSTANCE.getFrame().repaint();

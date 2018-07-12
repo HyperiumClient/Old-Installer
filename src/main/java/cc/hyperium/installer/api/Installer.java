@@ -432,6 +432,7 @@ public class Installer {
             }
 
             phrase = Phrase.DONE;
+            callback.accept(new StatusCallback(phrase, "Installation success", null));
             code = 0;
         } catch (Exception ex) {
             callback.accept(new ErrorCallback(ex, phrase));
