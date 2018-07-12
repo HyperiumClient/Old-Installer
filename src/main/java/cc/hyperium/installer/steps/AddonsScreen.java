@@ -151,6 +151,10 @@ public class AddonsScreen extends InstallerStep {
     }
 
     private void ensureDependencies() {
-        dependencies.forEach((k, v) -> k.setEnabled(Arrays.stream(v).allMatch(dep -> dependencies.keySet().stream().filter(c -> dep.equals(c.getText().replace("Addon :: ", ""))).allMatch(JRadioButton::isSelected))));
+        dependencies.forEach((k, v) -> {
+            k.setEnabled(Arrays.stream(v).allMatch(dep -> dependencies.keySet().stream().filter(c -> dep.equals(c.getText().replace("Addon :: ", ""))).allMatch(JRadioButton::isSelected)));
+            if (!k.isEnabled())
+                k.setSelected(false);
+        });
     }
 }
