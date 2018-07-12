@@ -51,7 +51,7 @@ public class InstallerMain {
         System.setErr(logStream);
 
         AtomicBoolean pass = new AtomicBoolean(false);
-        logger.info("Java version: " + System.getProperty("java.version"));
+        logger.debug("Java version: " + System.getProperty("java.version"));
         logger.info("Loading launcher manifest asynchronously...");
         Multithreading.runAsync(() -> {
             InstallerUtils.getManifest();
