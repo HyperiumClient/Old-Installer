@@ -8,8 +8,10 @@ Universal installer for hyperium, developed and maintained by Cubxity. The insta
 ![](http://cubxity.hypixel.life/b1a4e9e.png)
 ![](http://cubxity.hypixel.life/b15fe77.png)
 
-## How to use
+## Usage
 Download latest one from "Releases", then run it
+
+Tutorial [Click here](https://youtu.be/jG1OezVOiO0)
 
 ## Requirements
 Java 8 (might be bugged with java 9 and 10)
