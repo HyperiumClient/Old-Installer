@@ -10,8 +10,19 @@ import cc.hyperium.installer.components.VScrollBarUI;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
@@ -22,7 +33,7 @@ import java.util.List;
  * Created by Cubxity on 08/07/2018
  */
 public class AddonsScreen extends InstallerStep {
-    private HashMap<JRadioButton, String[]> dependencies = new HashMap<>();
+    private final HashMap<JRadioButton, String[]> dependencies = new HashMap<>();
 
     @Override
     public void addComponents(Container c) {

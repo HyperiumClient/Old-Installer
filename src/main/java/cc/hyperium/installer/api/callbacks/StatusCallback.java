@@ -5,9 +5,9 @@ package cc.hyperium.installer.api.callbacks;
  */
 public class StatusCallback extends AbstractCallback {
 
-    private Phrase phrase;
-    private String message;
-    private Object object;
+    private final Phrase phrase;
+    private final String message;
+    private final Object object;
 
     public StatusCallback(Phrase phrase, String message, Object object) {
         this.phrase = phrase;

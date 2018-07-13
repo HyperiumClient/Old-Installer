@@ -48,9 +48,8 @@ public class DownloadTask extends SwingWorker<Void, Void> {
         FileOutputStream outputStream = new FileOutputStream(saveFilePath);
 
         byte[] buffer = new byte[BUFFER_SIZE];
-        int bytesRead = -1;
+        int bytesRead, percentCompleted;
         long totalBytesRead = 0;
-        int percentCompleted = 0;
         long fileSize = util.getContentLength();
 
         while ((bytesRead = inputStream.read(buffer)) != -1) {

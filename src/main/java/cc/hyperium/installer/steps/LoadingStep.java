@@ -2,8 +2,9 @@ package cc.hyperium.installer.steps;
 
 import cc.hyperium.installer.InstallerMain;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JLabel;
+import java.awt.Color;
+import java.awt.Container;
 
 /*
  * Created by Cubxity on 06/07/2018

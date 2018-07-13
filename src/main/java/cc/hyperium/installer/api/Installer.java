@@ -11,6 +11,7 @@ import cc.hyperium.installer.api.entities.internal.AddonManifestParser;
 import cc.hyperium.utils.DownloadTask;
 import cc.hyperium.utils.InstallerUtils;
 import cc.hyperium.utils.JsonHolder;
+import com.google.common.io.Files;
 import com.google.gson.JsonArray;
 import org.apache.commons.io.FileUtils;
 
@@ -20,9 +21,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -33,9 +40,9 @@ import java.util.stream.Collectors;
 public class Installer {
     public static final int API_VERSION = 1;
 
-    private InstallerConfig config;
+    private final InstallerConfig config;
 
-    private Consumer<AbstractCallback> callback;
+    private final Consumer<AbstractCallback> callback;
 
     private int code = 1;
 
@@ -142,7 +149,7 @@ public class Installer {
             if (of) {
                 phrase = Phrase.DOWNLOAD_COMPONENTS;
                 callback.accept(new StatusCallback(phrase, "Downloading Optifine", null));
-                File tmpDir = Files.createTempDirectory("Hyperium").toFile();
+                File tmpDir = java.nio.file.Files.createTempDirectory("Hyperium").toFile();
                 try {
                     DownloadTask dl = new DownloadTask("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/files/mods/OptiFine_1.8.9_HD_U_I7.jar", tmpDir.getAbsolutePath());
                     dl.addPropertyChangeListener(evt -> {
@@ -271,7 +278,7 @@ public class Installer {
                 File pack = new File(target, "mmc-pack.json");
                 JsonHolder packJson;
                 try {
-                    packJson = pack.exists() ? new JsonHolder(com.google.common.io.Files.toString(pack, Charset.defaultCharset())) : new JsonHolder();
+                    packJson = pack.exists() ? new JsonHolder(Files.asCharSource(pack, Charset.defaultCharset()).read()) : new JsonHolder();
                 } catch (IOException ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to read mmc-pack.json"));
                     return;
@@ -314,7 +321,7 @@ public class Installer {
                 packJson.put("components", components);
                 packJson.put("formatVersion", 1);
                 try {
-                    com.google.common.io.Files.write(packJson.toString(), pack, Charset.defaultCharset());
+                    Files.asCharSink(pack, Charset.defaultCharset()).write(packJson.toString());
                 } catch (IOException ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to write mmc-pack.json"));
                     return;
@@ -355,7 +362,7 @@ public class Installer {
                 hyperiumJson.put("formatVersion", 1);
 
                 try {
-                    com.google.common.io.Files.write(hyperiumJson.toString(), new File(patches, "cc.hyperium.json"), Charset.defaultCharset());
+                    Files.asCharSink(new File(patches, "cc.hyperium.json"), Charset.defaultCharset()).write(hyperiumJson.toString());
                 } catch (IOException ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to write cc.hyperium.json"));
                     return;
@@ -364,7 +371,7 @@ public class Installer {
                 File icons = new File(mc, "icons");
                 icons.mkdir();
                 try {
-                    com.google.common.io.Files.write(Base64.getDecoder().decode(InstallerUtils.ICON_BASE64.replace("data:image/png;base64,", "")), new File(icons, "hyperium.png"));
+                    Files.write(Base64.getDecoder().decode(InstallerUtils.ICON_BASE64.replace("data:image/png;base64,", "")), new File(icons, "hyperium.png"));
                 } catch (IOException ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to add hyperium icon"));
                     return;
@@ -374,8 +381,8 @@ public class Installer {
                 JsonHolder json;
                 JsonHolder launcherProfiles;
                 try {
-                    json = new JsonHolder(com.google.common.io.Files.toString(targetJson, Charset.defaultCharset()));
-                    launcherProfiles = new JsonHolder(com.google.common.io.Files.toString(new File(mc, "launcher_profiles.json"), Charset.defaultCharset()));
+                    json = new JsonHolder(Files.asCharSource(targetJson, Charset.defaultCharset()).read());
+                    launcherProfiles = new JsonHolder(Files.asCharSource(new File(mc, "launcher_profiles.json"), Charset.defaultCharset()).read());
                 } catch (IOException ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to read profile"));
                     return;
@@ -421,8 +428,8 @@ public class Installer {
                 launcherProfiles.put("profiles", profiles);
 
                 try {
-                    com.google.common.io.Files.write(json.toString(), targetJson, Charset.defaultCharset());
-                    com.google.common.io.Files.write(launcherProfiles.toString(), new File(mc, "launcher_profiles.json"), Charset.defaultCharset());
+                    Files.asCharSink(targetJson, Charset.defaultCharset()).write(json.toString());
+                    Files.asCharSink( new File(mc, "launcher_profiles.json"), Charset.defaultCharset()).write(launcherProfiles.toString());
                 } catch (IOException ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to write profile"));
                     return;

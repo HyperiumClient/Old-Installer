@@ -2,8 +2,11 @@ package cc.hyperium.installer.components;
 
 import cc.hyperium.utils.Colors;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+import java.awt.Color;
+import java.awt.Component;
 
 /*
  * Created by Cubxity on 06/07/2018
