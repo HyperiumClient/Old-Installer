@@ -106,11 +106,8 @@ public class InstallerUtils {
         return r.toString();
     }
 
-    public static void loadURL(URL url) throws Exception {
-        URLClassLoader ucl = (URLClassLoader) InstallerMain.class.getClassLoader();
-        Method m = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-        m.setAccessible(true);
-        m.invoke(ucl, url);
+    public static Class<?> loadClass(URL url, String c) throws ClassNotFoundException {
+        return new URLClassLoader(new URL[]{url}).loadClass(c);
     }
 
 }

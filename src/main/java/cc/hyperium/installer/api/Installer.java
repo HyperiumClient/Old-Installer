@@ -179,9 +179,7 @@ public class Installer {
                     optifineLibDir.mkdirs();
                     File optifineLib = new File(optifineLibDir, "OptiFine-1.8.9_HD_U_I7.jar");
 
-                    InstallerUtils.loadURL(optifine.toURI().toURL());
-
-                    Class<?> patcher = Class.forName("optifine.Patcher");
+                    Class<?> patcher = InstallerUtils.loadClass(optifine.toURI().toURL(), "optifine.Patcher");
                     Method main = patcher.getMethod("main", String[].class);
                     main.invoke(null, new Object[]{new String[]{originJar.getAbsolutePath(), optifine.getAbsolutePath(), optifineLib.getAbsolutePath()}});
                 } catch (Exception ex) {
