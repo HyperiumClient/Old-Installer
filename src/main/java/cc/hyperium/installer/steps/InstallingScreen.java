@@ -84,9 +84,7 @@ public class InstallingScreen extends InstallerStep {
             try {
                 in.install();
                 InstallerMain.INSTANCE.getLogger().info("Installation finished with code {}", in.getCode());
-                SwingUtilities.invokeLater(() -> {
-                    super.addComponents(panel);
-                });
+                SwingUtilities.invokeLater(() -> super.addComponents(panel));
                 InstallerMain.INSTANCE.getFrame().repaint();
             } catch (Exception ex) {
                 InstallerMain.INSTANCE.getLogger().error("Unexpected error occurred during installation", ex);
