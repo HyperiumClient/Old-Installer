@@ -1,7 +1,15 @@
 package cc.hyperium.installer;
 
 import cc.hyperium.installer.api.entities.InstallerConfig;
-import cc.hyperium.installer.steps.*;
+import cc.hyperium.installer.steps.AddonsScreen;
+import cc.hyperium.installer.steps.InstallerStep;
+import cc.hyperium.installer.steps.InstallingScreen;
+import cc.hyperium.installer.steps.LoadingStep;
+import cc.hyperium.installer.steps.PrivacyScreen;
+import cc.hyperium.installer.steps.SettingsScreen;
+import cc.hyperium.installer.steps.TOSScreen;
+import cc.hyperium.installer.steps.VersionScreen;
+import cc.hyperium.installer.steps.WelcomeScreen;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
 import cc.hyperium.utils.Multithreading;
@@ -10,9 +18,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;

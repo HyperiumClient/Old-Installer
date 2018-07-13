@@ -9,8 +9,15 @@ import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.Multithreading;
 import com.google.gson.Gson;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;

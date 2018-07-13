@@ -10,9 +10,15 @@ import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import javax.swing.plaf.basic.BasicComboBoxUI;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Image;
 import java.io.IOException;
 import java.util.Arrays;
 

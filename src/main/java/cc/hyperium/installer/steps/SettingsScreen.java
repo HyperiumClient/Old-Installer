@@ -6,9 +6,18 @@ import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.SliderUI;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 

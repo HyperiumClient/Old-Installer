@@ -3,9 +3,12 @@ package cc.hyperium.installer.components;
 import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.utils.Colors;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.FlowLayout;
 
 /*
  * Created by Cubxity on 06/07/2018

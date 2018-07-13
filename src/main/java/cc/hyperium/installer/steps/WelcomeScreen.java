@@ -4,8 +4,13 @@ import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.installer.components.FlatButton;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Image;
 import java.io.IOException;
 
 /*

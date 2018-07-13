@@ -1,6 +1,6 @@
 package cc.hyperium.installer.api.entities
 
-import java.util.*
+import java.util.Arrays
 
 /*
  * Created by Cubxity on 06/07/2018
@@ -22,7 +22,7 @@ class AddonManifest(
 
         other as AddonManifest
 
-        if(name != other.name) return false
+        if (name != other.name) return false
         if (description != other.description) return false
         if (version != other.version) return false
         if (author != other.author) return false

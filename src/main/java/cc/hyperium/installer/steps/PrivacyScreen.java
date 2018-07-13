@@ -5,11 +5,17 @@ import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.HScrollBarUI;
 import cc.hyperium.installer.components.VScrollBarUI;
 import cc.hyperium.utils.Colors;
-import cc.hyperium.utils.InstallerUtils;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Rectangle;
 
 /*
  * Created by Cubxity on 09/07/2018
