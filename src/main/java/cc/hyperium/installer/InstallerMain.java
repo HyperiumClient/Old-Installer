@@ -80,6 +80,7 @@ public class InstallerMain {
                 new VersionScreen(),
                 new AddonsScreen(),
                 new TOSScreen(),
+                new PrivacyScreen(),
                 new InstallingScreen()
         ));
         try {

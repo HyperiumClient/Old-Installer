@@ -14,25 +14,25 @@ import java.io.IOException;
 /*
  * Created by Cubxity on 09/07/2018
  */
-public class TOSScreen extends InstallerStep {
+public class PrivacyScreen extends InstallerStep {
     @Override
     public void addComponents(Container c) {
         super.addComponents(c);
 
-        JLabel text = new JLabel("License agreement", SwingConstants.CENTER);
+        JLabel text = new JLabel("Privacy Policy", SwingConstants.CENTER);
         text.setFont(InstallerMain.INSTANCE.getTitle());
         text.setForeground(Color.WHITE);
         text.setBounds(0, 20, c.getWidth(), 65);
         c.add(text);
 
-        String license;
-        try {
-            license = InstallerUtils.getRaw("https://raw.githubusercontent.com/HyperiumClient/Hyperium/master/LICENSE");
-        } catch (IOException e) {
-            e.printStackTrace();
-            license = "LICENSE: https://raw.githubusercontent.com/HyperiumClient/Hyperium/master/LICENSE";
-        }
-        JTextArea essay = new JTextArea(license);
+        JTextArea essay = new JTextArea("Privacy Policy\n\n\n" +
+                "What data does Hyperium Collect?" +
+                "\n" +
+                "When using Hyperium, the client and integrated mods send a few small pieces of information to a remote server in exchange for a temporary token for accessing data from Hypixel. This information includes your Minecraft UUID and username, Minecraft Version, Client Version and specific mod being used. This information is processed and used to determine if the client is out of date or if the client should abort the startup procedure.\n\n" +
+                "What we do with the data?\n" +
+                "\n" +
+                "The data is stored securely for analytic purposes. We will never sell or release the data collected from specific users. All analytic graphs may be viewed on sk1er.club/graphs/hyperium\n" +
+                "Last updated: March 17th, 2018\n");
         essay.setLineWrap(true);
         essay.setWrapStyleWord(true);
         essay.setFont(InstallerMain.INSTANCE.getFont());
