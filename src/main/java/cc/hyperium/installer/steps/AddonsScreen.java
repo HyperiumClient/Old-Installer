@@ -33,7 +33,7 @@ import java.util.List;
  * Created by Cubxity on 08/07/2018
  */
 public class AddonsScreen extends InstallerStep {
-    private HashMap<JRadioButton, String[]> dependencies = new HashMap<>();
+    private final HashMap<JRadioButton, String[]> dependencies = new HashMap<>();
 
     @Override
     public void addComponents(Container c) {

@@ -17,6 +17,8 @@
 
 package cc.hyperium.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,11 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Multithreading {
 
-    public static final ExecutorService POOL = Executors.newFixedThreadPool(100, new ThreadFactory() {
+    private static final ExecutorService POOL = Executors.newFixedThreadPool(100, new ThreadFactory() {
         final AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public Thread newThread(Runnable r) {
+        public Thread newThread(@NotNull Runnable r) {
             return new Thread(r, String.format("Thread %s", counter.incrementAndGet()));
         }
     });

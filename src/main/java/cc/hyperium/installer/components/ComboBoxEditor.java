@@ -14,8 +14,8 @@ import java.awt.FlowLayout;
  * Created by Cubxity on 06/07/2018
  */
 public class ComboBoxEditor extends BasicComboBoxEditor {
-    private JLabel label = new JLabel();
-    private JPanel panel = new JPanel();
+    private final JLabel label = new JLabel();
+    private final JPanel panel = new JPanel();
     private Object selectedItem;
 
     public ComboBoxEditor() {

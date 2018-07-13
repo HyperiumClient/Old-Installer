@@ -44,9 +44,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class InstallerMain {
     public static final InstallerMain INSTANCE = new InstallerMain();
 
-    private Queue<InstallerStep> steps = new ArrayDeque<>();
-    private Logger logger = LoggerFactory.getLogger("Installer");
-    private StringBuilder log = new StringBuilder();
+    private final Queue<InstallerStep> steps = new ArrayDeque<>();
+    private final Logger logger = LoggerFactory.getLogger("Installer");
+    private final StringBuilder log = new StringBuilder();
     private InstallerConfig config;
     private JFrame frame;
     private Font title;
