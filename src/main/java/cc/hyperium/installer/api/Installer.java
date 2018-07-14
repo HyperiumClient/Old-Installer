@@ -35,7 +35,7 @@ public class Installer {
 
     private final InstallerConfig config;
 
-    private final Consumer<AbstractCallback> callback;
+    private Consumer<AbstractCallback> callback;
 
     private int code = 1;
 
@@ -451,5 +451,9 @@ public class Installer {
 
     public int getCode() {
         return code;
+    }
+
+    public void setCallback(Consumer<AbstractCallback> callback) {
+        this.callback = callback;
     }
 }

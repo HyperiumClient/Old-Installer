@@ -9,15 +9,8 @@ import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.Multithreading;
 import com.google.gson.Gson;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Image;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
@@ -76,7 +69,12 @@ public class InstallingScreen extends InstallerStep {
 
             InstallerMain.INSTANCE.getLogger().info("Starting installation...");
 
-            Installer in = new Installer(InstallerMain.INSTANCE.getConfig(), callback -> {
+            Installer in = new Installer(InstallerMain.INSTANCE.getConfig(), null);
+            in.setCallback(callback -> {
+                if (in.getCode() == 0) {
+                    title.setText("Installation success"); // prevent issues
+                    return;
+                }
                 title.setText(callback.getMessage());
                 if (callback instanceof ErrorCallback)
                     InstallerMain.INSTANCE.getLogger().error("Unexpected error occurred during installation", ((ErrorCallback) callback).getError());
