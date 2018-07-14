@@ -44,6 +44,7 @@ public class PrivacyScreen extends InstallerStep {
         essay.setFont(InstallerMain.INSTANCE.getFont());
         essay.setForeground(new Color(250, 250, 250));
         essay.setBackground(Colors.DARK.brighter());
+        essay.setEditable(false);
 
         JScrollPane sp = new JScrollPane(essay, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         sp.setBackground(Colors.DARK.brighter());
