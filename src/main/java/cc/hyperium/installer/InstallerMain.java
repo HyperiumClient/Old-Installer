@@ -1,15 +1,8 @@
 package cc.hyperium.installer;
 
 import cc.hyperium.installer.api.entities.InstallerConfig;
-import cc.hyperium.installer.steps.AddonsScreen;
-import cc.hyperium.installer.steps.InstallerStep;
-import cc.hyperium.installer.steps.InstallingScreen;
-import cc.hyperium.installer.steps.LoadingStep;
-import cc.hyperium.installer.steps.PrivacyScreen;
-import cc.hyperium.installer.steps.SettingsScreen;
-import cc.hyperium.installer.steps.TOSScreen;
-import cc.hyperium.installer.steps.VersionScreen;
-import cc.hyperium.installer.steps.WelcomeScreen;
+import cc.hyperium.installer.api.entities.VersionManifest;
+import cc.hyperium.installer.steps.*;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
 import cc.hyperium.utils.Multithreading;
@@ -18,15 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,8 +22,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /*
  * Created by Cubxity on 05/07/2018
@@ -52,7 +41,7 @@ public class InstallerMain {
     private Font title;
     private Font font;
 
-    private void init() {
+    private void init(boolean local) {
         final PrintStream ps = System.out;
         final PrintStream logStream = new PrintStream(new OutputStream() {
             @Override
@@ -86,17 +75,20 @@ public class InstallerMain {
         else
             config = new InstallerConfig();
 
+        logger.debug("Local = {}", local);
         logger.info("Starting installer...");
-        steps.addAll(Arrays.asList(
+        steps.addAll(Arrays.stream(new InstallerStep[]{
                 new LoadingStep(),
                 new WelcomeScreen(),
                 new SettingsScreen(),
-                new VersionScreen(),
+                local ? null : new VersionScreen(),
                 new AddonsScreen(),
                 new TOSScreen(),
                 new PrivacyScreen(),
                 new InstallingScreen()
-        ));
+        }).filter(Objects::nonNull).collect(Collectors.toList()));
+        if (local)
+            config.setVersion(new VersionManifest("LOCAL", 0, "cc.hyperium:Hyperium:LOCAL", "", "", "", 0, "cc/hyperium/Hyperium/LOCAL/Hyperium-LOCAL.jar", "", 1));
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(15f);
         } catch (FontFormatException | IOException e) {
@@ -136,7 +128,7 @@ public class InstallerMain {
     }
 
     public static void main(String... args) {
-        INSTANCE.init();
+        INSTANCE.init(args.length >= 1 && args[0].equals("local"));
     }
 
     public void next() {

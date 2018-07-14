@@ -22,14 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -95,7 +88,19 @@ public class Installer {
 
             if (config.getVersion().getName().equals("LOCAL")) {
                 phrase = Phrase.COPY_VERSION;
-                //TODO: Finish this
+                File local;
+
+                local = new File(InstallerMain.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                InstallerMain.INSTANCE.getLogger().debug("Local = {}", local.getAbsolutePath());
+                callback.accept(new StatusCallback(phrase, "Copying local jar", local));
+                try {
+                    File localLib = new File(libraries, config.getVersion().getPath().replace("/", sep));
+                    localLib.getParentFile().mkdirs();
+                    Files.copy(local, new File(localLib.getParent(), localLib.getName()));
+                } catch (IOException e) {
+                    callback.accept(new ErrorCallback(e, phrase, "Failed to copy local jar: " + e.getMessage()));
+                    return;
+                }
             } else {
                 try {
                     File hyperium = new File(mc, "libraries" + sep + "cc" + sep + "hyperium" + sep + "Hyperium");
@@ -429,7 +434,7 @@ public class Installer {
 
                 try {
                     Files.asCharSink(targetJson, Charset.defaultCharset()).write(json.toString());
-                    Files.asCharSink( new File(mc, "launcher_profiles.json"), Charset.defaultCharset()).write(launcherProfiles.toString());
+                    Files.asCharSink(new File(mc, "launcher_profiles.json"), Charset.defaultCharset()).write(launcherProfiles.toString());
                 } catch (IOException ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to write profile"));
                     return;
