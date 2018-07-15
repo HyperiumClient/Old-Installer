@@ -88,7 +88,7 @@ public class InstallerMain {
                 new InstallingScreen()
         }).filter(Objects::nonNull).collect(Collectors.toList()));
         if (local)
-            config.setVersion(new VersionManifest("LOCAL", 0, "cc.hyperium:Hyperium:LOCAL", "", "", "", 0, "cc/hyperium/Hyperium/LOCAL/Hyperium-LOCAL.jar", "", 1));
+            config.setVersion(new VersionManifest("LOCAL", 0, "cc.hyperium:Hyperium:LOCAL", "", "", "", 0, "cc/hyperium/Hyperium/LOCAL/Hyperium-LOCAL.jar", "cc.hyperium.launch.HyperiumTweaker", 1));
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(15f);
         } catch (FontFormatException | IOException e) {
