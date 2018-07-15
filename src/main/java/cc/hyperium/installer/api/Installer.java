@@ -13,6 +13,7 @@ import cc.hyperium.utils.InstallerUtils;
 import cc.hyperium.utils.JsonHolder;
 import com.google.common.io.Files;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonPrimitive;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -337,7 +338,7 @@ public class Installer {
 
                 JsonHolder hyperiumJson = new JsonHolder();
                 JsonArray tweakers = new JsonArray();
-                tweakers.add(config.getVersion().getTweaker());
+                tweakers.add(new JsonPrimitive(config.getVersion().getTweaker()));
                 hyperiumJson.put("+tweakers", tweakers);
 
                 JsonArray libs = new JsonArray();
