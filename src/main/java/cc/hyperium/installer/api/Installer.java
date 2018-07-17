@@ -69,7 +69,7 @@ public class Installer {
             File originJar = new File(origin, mmc ? "minecraft-1.8.9-client.jar" : "1.8.9.jar");
 
             if (mmc ? (!origin.exists() || !originJar.exists()) : (!origin.exists() || !originJson.exists() || !originJar.exists())) {
-                callback.accept(new ErrorCallback(new IllegalStateException("Version '1.8.9' does not exist"), phrase, "Plesae run Minecrft 1.8.9 then try again"));
+                callback.accept(new ErrorCallback(new IllegalStateException("Version '1.8.9' does not exist"), phrase, "Please run Minecraft 1.8.9 then try again"));
                 return;
             }
 
