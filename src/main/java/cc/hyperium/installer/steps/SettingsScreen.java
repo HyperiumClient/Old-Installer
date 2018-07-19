@@ -6,18 +6,9 @@ import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.SliderUI;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Image;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -38,6 +29,12 @@ public class SettingsScreen extends InstallerStep {
         int w = c.getHeight() / 3;
         int y = c.getHeight() / 2 - w / 2;
         int x = c.getWidth() / 2;
+
+        JLabel wamLabel = new JLabel("RAM", JLabel.CENTER);
+        wamLabel.setFont(InstallerMain.INSTANCE.getFont());
+        wamLabel.setForeground(Color.WHITE);
+        wamLabel.setBounds(x - w * 2, y + w + 10, w, 20);
+        c.add(wamLabel);
 
         JPanel wam = new CirclePanel();
         wam.setBounds(x - w * 2, y, w, w);
@@ -72,6 +69,12 @@ public class SettingsScreen extends InstallerStep {
         });
         wam.add(wamSlider);
 
+        JLabel dirLabel = new JLabel("MC Folder", JLabel.CENTER);
+        dirLabel.setFont(InstallerMain.INSTANCE.getFont());
+        dirLabel.setForeground(Color.WHITE);
+        dirLabel.setBounds(x - w / 2, y + w + 10, w, 20);
+        c.add(dirLabel);
+
         JPanel dir = new CirclePanel();
         dir.setBounds(x - w / 2, y, w, w);
         dir.setOpaque(false);
@@ -102,6 +105,12 @@ public class SettingsScreen extends InstallerStep {
             }
         });
         dir.add(dirBtn);
+
+        JLabel localLabel = new JLabel("Local Java", JLabel.CENTER);
+        localLabel.setFont(InstallerMain.INSTANCE.getFont());
+        localLabel.setForeground(Color.WHITE);
+        localLabel.setBounds(x + w, y + w + 10, w, 20);
+        c.add(localLabel);
 
         JPanel jre = new CirclePanel();
         jre.setBounds(x + w, y, w, w);
