@@ -10,7 +10,7 @@ import cc.hyperium.installer.api.entities.internal.AddonManifest;
 import cc.hyperium.installer.api.entities.internal.AddonManifestParser;
 import cc.hyperium.utils.DownloadTask;
 import cc.hyperium.utils.InstallerUtils;
-import cc.hyperium.utils.JsonHolder;
+import cc.hyperium.installer.utils.JsonHolder;
 import com.google.common.io.Files;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;

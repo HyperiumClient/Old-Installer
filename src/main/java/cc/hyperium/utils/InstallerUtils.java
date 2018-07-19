@@ -1,6 +1,7 @@
 package cc.hyperium.utils;
 
 import cc.hyperium.installer.api.entities.InstallerManifest;
+import cc.hyperium.installer.utils.JsonHolder;
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
