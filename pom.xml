@@ -6,7 +6,7 @@
 
     <groupId>cc.hyperium.installer</groupId>
     <artifactId>Installer</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
 
     <properties>
         <kotlin.version>1.2.50</kotlin.version>
@@ -129,6 +129,18 @@
             <artifactId>guava</artifactId>
             <version>17.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.Cubxity</groupId>
+            <artifactId>LaunchWrapperPatcher</artifactId>
+            <version>81f509b36c</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
 </project>

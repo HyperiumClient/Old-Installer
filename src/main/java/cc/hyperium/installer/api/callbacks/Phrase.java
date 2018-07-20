@@ -46,10 +46,23 @@ public enum Phrase {
     PATCH_OPTIFINE,
 
     /**
+     * @since 1.3
+     *
+     * When it's downloading launchwrapper
+     */
+    DOWNLOAD_LAUNCHER,
+
+    /**
+     * @since 1.3
+     *
+     * When it's patching launchwrapper
+     */
+    PATCH_LAUNCHER,
+
+    /**
      * When it's creating launcher profile
      */
     CREATE_PROFILE,
-
 
     /**
      * When installation has finished

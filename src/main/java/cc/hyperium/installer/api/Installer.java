@@ -14,6 +14,7 @@ import cc.hyperium.utils.JsonHolder;
 import com.google.common.io.Files;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
+import me.cubxity.asm.LaunchWrapperPatcher;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
  * Created by Cubxity on 06/07/2018
  */
 public class Installer {
-    public static final int API_VERSION = 1;
+    public static final int API_VERSION = 2;
 
     private final InstallerConfig config;
 
@@ -257,6 +258,34 @@ public class Installer {
                 return;
             }
 
+            File launchWrapper = new File(libraries, "net" + sep + "minecraft" + sep + "launchwrapper" + sep + "1.7" + sep + "launchwrapper-1.7.jar");
+            launchWrapper.getParentFile().mkdirs();
+            if (!launchWrapper.exists()) {
+                phrase = Phrase.DOWNLOAD_LAUNCHER;
+                try {
+                    DownloadTask dl = new DownloadTask("https://libraries.minecraft.net/net/minecraft/launchwrapper/1.7/launchwrapper-1.7.jar", launchWrapper.getParentFile().getAbsolutePath());
+                    dl.addPropertyChangeListener(evt -> {
+                        if (evt.getNewValue() instanceof Integer)
+                            callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, "Downloading LaunchWrapper (" + evt.getNewValue() + "%)", null));
+                    });
+                    dl.execute();
+                    dl.get();
+                } catch (Exception ex) {
+                    callback.accept(new ErrorCallback(ex, phrase, "Failed to download LaunchWrapper, " + ex.getMessage()));
+                    return;
+                }
+            }
+
+            File customLaunchWrapper = new File(launchWrapper.getParentFile().getParentFile(), "Hyperium" + sep + "launchwrapper-Hyperium.jar");
+            customLaunchWrapper.getParentFile().mkdir();
+            phrase = Phrase.PATCH_LAUNCHER;
+            try {
+                LaunchWrapperPatcher.patch(launchWrapper, "cc/hyperium/utils/CrashHandler", "handle", "(Ljava/lang/Exception;)V", customLaunchWrapper);
+            } catch (Exception ex) {
+                callback.accept(new ErrorCallback(ex, phrase, "Failed to patch LaunchWrapper: " + ex.getMessage()));
+                return;
+            }
+
             phrase = Phrase.CREATE_PROFILE;
             callback.accept(new StatusCallback(phrase, "Creating profile", null));
             if (mmc) {
@@ -350,7 +379,8 @@ public class Installer {
                 );
                 libs.add(
                         new JsonHolder()
-                                .put("name", "net.minecraft:launchwrapper:1.7")
+                                .put("name", "net.minecraft:launchwrapper:Hyperium")
+                                .put("MMC-hint", "local")
                                 .getObject()
                 );
                 if (of)
@@ -397,7 +427,7 @@ public class Installer {
                 lib.put("name", config.getVersion().getName().equals("LOCAL") ? "cc.hyperium:Hyperium:LOCAL" : config.getVersion().getArtifactId());
                 JsonArray libs = json.optJSONArray("libraries");
                 libs.add(lib.getObject());
-                libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:1.7").getObject());
+                libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:Hyperium").getObject());
                 if (of)
                     libs.add(new JsonHolder().put("name", "optifine:OptiFine:1.8.9_HD_U_I7").getObject());
                 json.put("libraries", libs);
