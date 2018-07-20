@@ -15,7 +15,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cc.hyperium.utils;
+package cc.hyperium.installer.utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
