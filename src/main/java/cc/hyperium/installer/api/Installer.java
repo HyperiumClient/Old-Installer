@@ -449,7 +449,7 @@ public class Installer {
                         .put("created", instant.toString())
                         .put("lastUsed", instant.toString())
                         .put("lastVersionId", "Hyperium 1.8.9")
-                        .put("javaArgs", "-Xms512M -Xmx" + config.getWam() + "G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=16M -XX:+DisableExplicitGC")
+                        .put("javaArgs", "-Xms512M -Xmx" + config.getWam())
                         .put("icon", InstallerUtils.ICON_BASE64);
                 if (config.getLocalJre())
                     if (System.getProperty("java.version").startsWith("1.8"))
