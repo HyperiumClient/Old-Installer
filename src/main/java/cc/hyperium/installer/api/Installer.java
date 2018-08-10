@@ -449,7 +449,7 @@ public class Installer {
                         .put("created", instant.toString())
                         .put("lastUsed", instant.toString())
                         .put("lastVersionId", "Hyperium 1.8.9")
-                        .put("javaArgs", "-Xms512M -Xmx" + config.getWam())
+                        .put("javaArgs", "-Xms512M -Xmx" + config.getWam() + "G")
                         .put("icon", InstallerUtils.ICON_BASE64);
                 if (config.getLocalJre())
                     if (System.getProperty("java.version").startsWith("1.8"))
