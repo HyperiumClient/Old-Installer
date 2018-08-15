@@ -473,7 +473,7 @@ public class Installer {
             }
 
             phrase = Phrase.DONE;
-            callback.accept(new StatusCallback(phrase, "Installation success", null));
+            callback.accept(new StatusCallback(phrase, "Installation success! Launch from your Minecraft launcher.", null));
             code = 0;
         } catch (Exception ex) {
             callback.accept(new ErrorCallback(ex, phrase));
