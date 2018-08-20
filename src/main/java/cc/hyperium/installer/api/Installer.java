@@ -8,9 +8,9 @@ import cc.hyperium.installer.api.callbacks.StatusCallback;
 import cc.hyperium.installer.api.entities.InstallerConfig;
 import cc.hyperium.installer.api.entities.internal.AddonManifest;
 import cc.hyperium.installer.api.entities.internal.AddonManifestParser;
+import cc.hyperium.installer.utils.JsonHolder;
 import cc.hyperium.utils.DownloadTask;
 import cc.hyperium.utils.InstallerUtils;
-import cc.hyperium.installer.utils.JsonHolder;
 import com.google.common.io.Files;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
@@ -27,13 +27,12 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
-import java.util.stream.Collectors;
 
 /*
  * Created by Cubxity on 06/07/2018
  */
 public class Installer {
-    public static final int API_VERSION = 2;
+    public static final int API_VERSION = 3;
 
     private final InstallerConfig config;
 
@@ -96,7 +95,7 @@ public class Installer {
                 InstallerMain.INSTANCE.getLogger().debug("Local = {}", local.getAbsolutePath());
                 callback.accept(new StatusCallback(phrase, "Copying local jar", local));
                 try {
-                    File localLib = new File(libraries, config.getVersion().getPath().replace("/", sep));
+                    File localLib = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
                     localLib.getParentFile().mkdirs();
                     Files.copy(local, new File(localLib.getParent(), localLib.getName()));
                 } catch (IOException e) {
@@ -114,8 +113,9 @@ public class Installer {
                 phrase = Phrase.DOWNLOAD_CLIENT;
                 File downloaded;
                 try {
-                    List<String> sp = Arrays.asList(config.getVersion().getPath().split("/"));
-                    File dir = new File(libraries, sp.subList(0, sp.size() - 1).stream().collect(Collectors.joining(sep)));
+                    File dest = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
+                    ;
+                    File dir = dest.getParentFile();
                     InstallerMain.INSTANCE.getLogger().debug("Target directory: {}", dir.getAbsolutePath());
                     dir.mkdirs();
 
@@ -218,7 +218,7 @@ public class Installer {
                     }
             } else addonsDir.mkdirs();
             try {
-                List<cc.hyperium.installer.api.entities.AddonManifest> addons = Arrays.asList(InstallerUtils.getManifest().getAddons());
+                List<cc.hyperium.installer.api.entities.AddonManifest> addons = InstallerUtils.getManifest().getAddons();
                 for (String cm : config.getComponents()) {
                     if (cm.equals("Optifine")) continue;
                     Optional<cc.hyperium.installer.api.entities.AddonManifest> oa = addons.stream().filter(a -> a.getName().equals(cm)).findFirst();
@@ -367,13 +367,13 @@ public class Installer {
 
                 JsonHolder hyperiumJson = new JsonHolder();
                 JsonArray tweakers = new JsonArray();
-                tweakers.add(new JsonPrimitive(config.getVersion().getTweaker()));
+                tweakers.add(new JsonPrimitive("cc.hyperium.launch.LaunchTweaker"));
                 hyperiumJson.put("+tweakers", tweakers);
 
                 JsonArray libs = new JsonArray();
                 libs.add(
                         new JsonHolder()
-                                .put("name", config.getVersion().getArtifactId())
+                                .put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName())
                                 .put("MMC-hint", "local")
                                 .getObject()
                 );
@@ -424,7 +424,7 @@ public class Installer {
                     return;
                 }
                 JsonHolder lib = new JsonHolder();
-                lib.put("name", config.getVersion().getName().equals("LOCAL") ? "cc.hyperium:Hyperium:LOCAL" : config.getVersion().getArtifactId());
+                lib.put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName());
                 JsonArray libs = json.optJSONArray("libraries");
                 libs.add(lib.getObject());
                 libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:Hyperium").getObject());
@@ -433,7 +433,7 @@ public class Installer {
                 json.put("libraries", libs);
                 json.put("id", "Hyperium 1.8.9");
                 json.put("mainClass", "net.minecraft.launchwrapper.Launch");
-                json.put("minecraftArguments", json.optString("minecraftArguments") + " --tweakClass=" + (config.getVersion().getName().equals("LOCAL") ? "cc.hyperium.launch.HyperiumTweaker" : config.getVersion().getTweaker()));
+                json.put("minecraftArguments", json.optString("minecraftArguments") + " --tweakClass=cc.hyperium.launch.HyperiumTweaker");
 
                 JsonHolder profiles = launcherProfiles.optJSONObject("profiles");
                 Instant instant = Instant.ofEpochMilli(System.currentTimeMillis());

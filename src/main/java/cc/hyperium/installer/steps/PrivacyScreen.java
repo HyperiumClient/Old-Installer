@@ -37,8 +37,8 @@ public class PrivacyScreen extends InstallerStep {
                 "When using Hyperium, the client and integrated mods send a few small pieces of information to a remote server in exchange for a temporary token for accessing data from Hypixel. This information includes your Minecraft UUID and username, Minecraft Version, Client Version and specific mod being used. This information is processed and used to determine if the client is out of date or if the client should abort the startup procedure.\n\n" +
                 "What we do with the data?\n" +
                 "\n" +
-                "The data is stored securely for analytic purposes. We will never sell or release the data collected from specific users. All analytic graphs may be viewed on sk1er.club/graphs/hyperium\n" +
-                "Last updated: March 17th, 2018\n");
+                "The data is stored securely for analytic purposes. We will never sell or release the data collected from specific users. All analytic graphs may be viewed on sk1er.club/graphs/hyperium\nHyperium may also collect the servers you play on and the duration of time spent on servers.\n" +
+                "Last updated: August 19th, 2018\n");
         essay.setLineWrap(true);
         essay.setWrapStyleWord(true);
         essay.setFont(InstallerMain.INSTANCE.getFont());

@@ -1,20 +1,14 @@
 package cc.hyperium.installer.api.entities
 
-import com.google.gson.annotations.SerializedName
-import java.util.Arrays
+import java.util.*
 
 /*
  * Created by Cubxity on 06/07/2018
  */
 data class InstallerManifest(
-        @SerializedName("latest-supported")
-        val latestSupported: Int,
-        @SerializedName("latest-stable")
-        val latestStable: String,
-        @SerializedName("latest-dev")
-        val latestDev: String,
+        val latest: VersionManifest,
         val versions: Array<VersionManifest>,
-        val addons: Array<AddonManifest>
+        val addons: MutableList<AddonManifest> = mutableListOf()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -22,21 +16,18 @@ data class InstallerManifest(
 
         other as InstallerManifest
 
-        if (latestSupported != other.latestSupported) return false
-        if (latestStable != other.latestStable) return false
-        if (latestDev != other.latestDev) return false
+        if (latest != other.latest) return false
         if (!Arrays.equals(versions, other.versions)) return false
-        if (!Arrays.equals(addons, other.addons)) return false
+        if (addons != other.addons) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = latestSupported
-        result = 31 * result + latestStable.hashCode()
-        result = 31 * result + latestDev.hashCode()
+        var result = latest.hashCode()
         result = 31 * result + Arrays.hashCode(versions)
-        result = 31 * result + Arrays.hashCode(addons)
+        result = 31 * result + addons.hashCode()
         return result
     }
+
 }
