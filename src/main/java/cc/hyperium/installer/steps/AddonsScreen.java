@@ -122,7 +122,7 @@ public class AddonsScreen extends InstallerStep {
                     @Override
                     public void mouseEntered(MouseEvent e) {
                         cLabel.setText(a.getName());
-                        cDesc.setText(a.getDescription() + (a.getVerified() ? "\n\nThis addon was verified by a hyperium admin" : "") + "\n\nVersion: " + a.getVersion() + "\nAuthor: " + a.getAuthor());
+                        cDesc.setText(a.getDescription() + (a.getVerified() ? "\n\nThis addon was verified by a Hyperium admin" : "") + "\n\nVersion: " + a.getVersion() + "\nAuthor: " + a.getAuthor());
                     }
 
                     @Override
