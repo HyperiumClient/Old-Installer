@@ -66,16 +66,17 @@ public class InstallerMain {
         });
 
         logger.info("Loading previous settings...");
-        File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
-        if (prev.exists())
+        File prev = new File(".", "hinstaller-state.json");
+        if (prev.exists()) {
             try {
                 config = new Gson().fromJson(new String(Files.readAllBytes(prev.toPath()), Charset.defaultCharset()), InstallerConfig.class);
             } catch (Exception ex) {
                 logger.error("Failed to load previous installer config", ex);
                 config = new InstallerConfig();
             }
-        else
+        } else {
             config = new InstallerConfig();
+        }
 
         logger.debug("Local = {}", local);
         logger.info("Starting installer...");
@@ -98,7 +99,7 @@ public class InstallerMain {
             font = new Font("Arial", Font.PLAIN, 15); //Fallback
         }
         title = font.deriveFont(50f);
-        logger.info("Initialing frame...");
+        logger.info("Initializing frame...");
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(new MetalLookAndFeel());
