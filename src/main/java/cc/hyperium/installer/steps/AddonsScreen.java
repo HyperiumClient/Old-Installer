@@ -87,14 +87,14 @@ public class AddonsScreen extends InstallerStep {
             @Override
             public void mouseExited(MouseEvent e) {
                 cLabel.setText("Components");
-                cDesc.setText("Select components you would like it to be installed");
+                cDesc.setText("Select the components you'd like to install");
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
                 cLabel.setText("Optifine");
                 cDesc.setText("Optifine is a Minecraft optimization mod.\n" +
-                        "It allows Minecraft to run faster and look better with full support for HD textures and many configuration options.");
+                        "It allows Minecraft to run faster and look better with full support for HD textures and adds many configuration options.");
             }
         });
         InstallerConfig ic = InstallerMain.INSTANCE.getConfig();
@@ -116,7 +116,7 @@ public class AddonsScreen extends InstallerStep {
                     @Override
                     public void mouseExited(MouseEvent e) {
                         cLabel.setText("Components");
-                        cDesc.setText("Select components you would like it to be installed");
+                        cDesc.setText("Select the components you'd like to install");
                     }
 
                     @Override
