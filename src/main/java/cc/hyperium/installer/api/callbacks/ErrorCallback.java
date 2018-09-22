@@ -20,7 +20,7 @@ public class ErrorCallback extends AbstractCallback {
 
     @Override
     public String getMessage() {
-        return message == null ? "Unexpected error: " + error.getMessage() + " in phrase " + phrase.toString() : message;
+        return message == null ? "Unexpected error: " + error.getMessage() + " in phase " + phrase.toString() : message;
     }
 
     public Exception getError() {

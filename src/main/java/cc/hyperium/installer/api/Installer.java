@@ -475,6 +475,10 @@ public class Installer {
             phrase = Phrase.DONE;
             callback.accept(new StatusCallback(phrase, "Installation success! Launch from your Minecraft launcher.", null));
             code = 0;
+
+            if(!InstallerMain.INSTANCE.getLaunchCommand().isEmpty()){
+                InstallerMain.INSTANCE.launchMinecraft();
+            }
         } catch (Exception ex) {
             callback.accept(new ErrorCallback(ex, phrase));
         }

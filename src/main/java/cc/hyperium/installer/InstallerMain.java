@@ -3,7 +3,15 @@ package cc.hyperium.installer;
 import cc.hyperium.installer.api.Installer;
 import cc.hyperium.installer.api.entities.InstallerConfig;
 import cc.hyperium.installer.api.entities.VersionManifest;
-import cc.hyperium.installer.steps.*;
+import cc.hyperium.installer.steps.AddonsScreen;
+import cc.hyperium.installer.steps.InstallerStep;
+import cc.hyperium.installer.steps.InstallingScreen;
+import cc.hyperium.installer.steps.LoadingStep;
+import cc.hyperium.installer.steps.PrivacyScreen;
+import cc.hyperium.installer.steps.SettingsScreen;
+import cc.hyperium.installer.steps.TOSScreen;
+import cc.hyperium.installer.steps.VersionScreen;
+import cc.hyperium.installer.steps.WelcomeScreen;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
 import cc.hyperium.utils.Multithreading;
@@ -12,9 +20,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,6 +47,7 @@ import java.util.stream.Collectors;
  */
 public class InstallerMain {
     public static final InstallerMain INSTANCE = new InstallerMain();
+    public String launchCommand = "";
 
     private final Queue<InstallerStep> steps = new ArrayDeque<>();
     private final Logger logger = LoggerFactory.getLogger("Installer");
@@ -41,6 +56,91 @@ public class InstallerMain {
     private JFrame frame;
     private Font title;
     private Font font;
+
+    public static void main(String... args) {
+        if(args.length >= 1){
+            boolean local = args[0].equalsIgnoreCase("local");
+
+            if(args.length == 2){
+                // Installer has been called from the client.
+                String launchCommand = args[1];
+                INSTANCE.logger.info("LAUNCH COMMAND: " + launchCommand);
+                INSTANCE.setLaunchCommand(launchCommand);
+                INSTANCE.fastInstall(local);
+            } else{
+                // Installer has been called from the command line.
+                INSTANCE.init(local);
+            }
+        } else{
+            // Conventional installation.
+            INSTANCE.init(false);
+        }
+    }
+
+    private void fastInstall(boolean local){
+        logger.info("Loading previous settings...");
+        File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
+
+        if (prev.exists()) {
+            try {
+                config = new Gson().fromJson(new String(Files.readAllBytes(prev.toPath()), Charset.defaultCharset()), InstallerConfig.class);
+            } catch (Exception ex) {
+                logger.error("Failed to load previous installer config", ex);
+                config = new InstallerConfig();
+            }
+        } else {
+            config = new InstallerConfig();
+        }
+
+        if (local) {
+            config.setVersion(new VersionManifest("LOCAL", 0, "cc.hyperium:Hyperium:LOCAL", "", "", 0, 0, false, Installer.API_VERSION));
+        } else{
+            config.setVersion(InstallerUtils.getManifest().getLatest());
+        }
+        try {
+            font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(15f);
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+            font = new Font("Arial", Font.PLAIN, 15); //Fallback
+        }
+
+        System.out.println("Config INFO: ");
+        System.out.println("Version: " + INSTANCE.getConfig().getVersion());
+
+        title = font.deriveFont(50f);
+
+        // Start installing phase immediately.
+        logger.info("Beginning installation...");
+        initFrame();
+        InstallerStep installerStep = new InstallingScreen();
+        SwingUtilities.invokeLater(() -> {
+            frame.getContentPane().removeAll();
+            installerStep.modifyFrame(frame);
+            installerStep.addComponents(frame.getContentPane());
+            frame.repaint();
+        });
+    }
+
+        public void launchMinecraft(){
+        try {
+            Process p = Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
+            p.waitFor();
+            System.exit(0);
+        } catch (IOException e) {
+            logger.error("Failed to launch Minecraft!");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        }
+
+    public String getLaunchCommand() {
+        return launchCommand;
+    }
+
+    public void setLaunchCommand(String launchCommand) {
+        this.launchCommand = launchCommand;
+    }
 
     private void init(boolean local) {
         final PrintStream ps = System.out;
@@ -101,38 +201,40 @@ public class InstallerMain {
         title = font.deriveFont(50f);
         logger.info("Initializing frame...");
         SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(new MetalLookAndFeel());
-            } catch (Exception ignored) {
-            }
-            frame = new JFrame("Hyperium Installer");
-            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            try {
-                frame.setIconImage(ImageIO.read(getClass().getResourceAsStream("/icons/hyperium.png")));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            frame.setUndecorated(true);
-
-            frame.getContentPane().setBackground(Colors.DARK);
-            frame.getContentPane().setLayout(null);
-            frame.pack();
-
-            Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-            frame.setSize(dim.width / 2, dim.height / 2);
-            frame.setLocation(dim.width / 4, dim.height / 4);
-
-            frame.setVisible(true);
-
-            next();
+            initFrame();
             if (pass.get())
                 next();
         });
     }
 
-    public static void main(String... args) {
-        INSTANCE.init(args.length >= 1 && args[0].equals("local"));
+    private void initFrame(){
+        logger.info("Initialing frame...");
+        try {
+            UIManager.setLookAndFeel(new MetalLookAndFeel());
+        } catch (Exception ignored) {
+        }
+        frame = new JFrame("Hyperium Installer");
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        try {
+            frame.setIconImage(ImageIO.read(getClass().getResourceAsStream("/icons/hyperium.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        frame.setUndecorated(true);
+
+        frame.getContentPane().setBackground(Colors.DARK);
+        frame.getContentPane().setLayout(null);
+        frame.pack();
+
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setSize(dim.width / 2, dim.height / 2);
+        frame.setLocation(dim.width / 4, dim.height / 4);
+
+        frame.setVisible(true);
+
+        next();
     }
+
 
     public void next() {
         if (steps.isEmpty()) return;
