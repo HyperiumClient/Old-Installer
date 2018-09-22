@@ -124,12 +124,9 @@ public class InstallerMain {
         public void launchMinecraft(){
         try {
             Process p = Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
-            p.waitFor();
             System.exit(0);
         } catch (IOException e) {
             logger.error("Failed to launch Minecraft!");
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         }
