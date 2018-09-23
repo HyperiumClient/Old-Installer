@@ -47,37 +47,36 @@ import java.util.stream.Collectors;
  */
 public class InstallerMain {
     public static final InstallerMain INSTANCE = new InstallerMain();
-    public String launchCommand = "";
-
     private final Queue<InstallerStep> steps = new ArrayDeque<>();
     private final Logger logger = LoggerFactory.getLogger("Installer");
     private final StringBuilder log = new StringBuilder();
+    public String launchCommand = "";
     private InstallerConfig config;
     private JFrame frame;
     private Font title;
     private Font font;
 
     public static void main(String... args) {
-        if(args.length >= 1){
+        if (args.length >= 1) {
             boolean local = args[0].equalsIgnoreCase("local");
 
-            if(args.length == 2){
+            if (args.length == 2) {
                 // Installer has been called from the client.
                 String launchCommand = args[1];
                 INSTANCE.logger.info("LAUNCH COMMAND: " + launchCommand);
                 INSTANCE.setLaunchCommand(launchCommand);
                 INSTANCE.fastInstall(local);
-            } else{
+            } else {
                 // Installer has been called from the command line.
                 INSTANCE.init(local);
             }
-        } else{
+        } else {
             // Conventional installation.
             INSTANCE.init(false);
         }
     }
 
-    private void fastInstall(boolean local){
+    private void fastInstall(boolean local) {
         logger.info("Loading previous settings...");
         File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
 
@@ -94,7 +93,7 @@ public class InstallerMain {
 
         if (local) {
             config.setVersion(new VersionManifest("LOCAL", 0, "cc.hyperium:Hyperium:LOCAL", "", "", 0, 0, false, Installer.API_VERSION));
-        } else{
+        } else {
             config.setVersion(InstallerUtils.getManifest().getLatest());
         }
         try {
@@ -121,15 +120,22 @@ public class InstallerMain {
         });
     }
 
-        public void launchMinecraft(){
-        try {
-            Process p = Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
-            System.exit(0);
-        } catch (IOException e) {
-            logger.error("Failed to launch Minecraft!");
-            e.printStackTrace();
-        }
-        }
+    public void launchMinecraft() {
+        Thread launchThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("Launching Minecraft!");
+                    Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
+                } catch (IOException e) {
+                    logger.info("Failed to launch Minecraft.");
+                    e.printStackTrace();
+                }
+            }
+        });
+        launchThread.start();
+        System.exit(0);
+    }
 
     public String getLaunchCommand() {
         return launchCommand;
@@ -204,7 +210,7 @@ public class InstallerMain {
         });
     }
 
-    private void initFrame(){
+    private void initFrame() {
         logger.info("Initialing frame...");
         try {
             UIManager.setLookAndFeel(new MetalLookAndFeel());
