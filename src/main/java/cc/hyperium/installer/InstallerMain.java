@@ -169,7 +169,7 @@ public class InstallerMain {
         });
 
         logger.info("Loading previous settings...");
-        File prev = new File(".", "hinstaller-state.json");
+        File prev = new File(System.getProperty("java.home"), "hinstaller-state.json");
         if (prev.exists()) {
             try {
                 config = new Gson().fromJson(new String(Files.readAllBytes(prev.toPath()), Charset.defaultCharset()), InstallerConfig.class);
