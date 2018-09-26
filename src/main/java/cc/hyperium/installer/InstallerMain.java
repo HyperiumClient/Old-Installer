@@ -169,7 +169,7 @@ public class InstallerMain {
         });
 
         logger.info("Loading previous settings...");
-        File prev = new File(System.getProperty("java.home"), "hinstaller-state.json");
+        File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
         if (prev.exists()) {
             logger.debug("File exists!");
             try {
