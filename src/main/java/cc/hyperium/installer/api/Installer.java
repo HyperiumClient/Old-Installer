@@ -93,7 +93,8 @@ public class Installer {
                 }
 
 
-            if (config.getVersion().getName().equals("LOCAL")) {
+            boolean local1 = config.getVersion().getName().equals("LOCAL");
+            if (local1) {
                 phrase = Phrase.COPY_VERSION;
                 File local;
 
@@ -430,7 +431,7 @@ public class Installer {
                     return;
                 }
                 JsonHolder lib = new JsonHolder();
-                lib.put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName() + " (" + config.getVersion().getId() + ")");
+                lib.put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName() + (local1 ? "" : " (" + config.getVersion().getId() + ")"));
                 JsonArray libs = json.optJSONArray("libraries");
                 libs.add(lib.getObject());
                 libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:Hyperium").getObject());
