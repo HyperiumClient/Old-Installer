@@ -24,7 +24,13 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.time.Instant;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
 
@@ -95,7 +101,7 @@ public class Installer {
                 InstallerMain.INSTANCE.getLogger().debug("Local = {}", local.getAbsolutePath());
                 callback.accept(new StatusCallback(phrase, "Copying local jar", local));
                 try {
-                    File localLib = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
+                    File localLib = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + "-"+config.getVersion().getId() + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
                     localLib.getParentFile().mkdirs();
                     Files.copy(local, new File(localLib.getParent(), localLib.getName()));
                 } catch (IOException e) {
@@ -113,7 +119,7 @@ public class Installer {
                 phrase = Phrase.DOWNLOAD_CLIENT;
                 File downloaded;
                 try {
-                    File dest = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
+                    File dest = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + " ("+config.getVersion().getId()+")"+ sep + "Hyperium-" + config.getVersion().getName() + ".jar");
                     ;
                     File dir = dest.getParentFile();
                     InstallerMain.INSTANCE.getLogger().debug("Target directory: {}", dir.getAbsolutePath());
@@ -373,7 +379,7 @@ public class Installer {
                 JsonArray libs = new JsonArray();
                 libs.add(
                         new JsonHolder()
-                                .put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName())
+                                .put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName() + " (" + config.getVersion().getId()+")" )
                                 .put("MMC-hint", "local")
                                 .getObject()
                 );
@@ -424,7 +430,7 @@ public class Installer {
                     return;
                 }
                 JsonHolder lib = new JsonHolder();
-                lib.put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName());
+                lib.put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName() + " (" + config.getVersion().getId()+")" );
                 JsonArray libs = json.optJSONArray("libraries");
                 libs.add(lib.getObject());
                 libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:Hyperium").getObject());
@@ -476,7 +482,7 @@ public class Installer {
             callback.accept(new StatusCallback(phrase, "Installation success! Launch from your Minecraft launcher.", null));
             code = 0;
 
-            if(!InstallerMain.INSTANCE.getLaunchCommand().isEmpty()){
+            if (!InstallerMain.INSTANCE.getLaunchCommand().isEmpty()) {
                 InstallerMain.INSTANCE.launchMinecraft();
             }
         } catch (Exception ex) {

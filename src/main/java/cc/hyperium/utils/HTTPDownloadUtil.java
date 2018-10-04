@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,6 +74,7 @@ public class HTTPDownloadUtil {
                 fileName = fileURL.substring(fileURL.lastIndexOf("/") + 1,
                         fileURL.length());
             }
+            fileName = URLDecoder.decode(fileName, "UTF-8");
 
             // output for debugging purpose only
             System.out.println("Content-Type = " + contentType);
