@@ -7,8 +7,10 @@ import java.util.*
  */
 data class InstallerManifest(
         val latest: VersionManifest,
+        val latest_beta: VersionManifest,
         val versions: Array<VersionManifest>,
         val addons: MutableList<AddonManifest> = mutableListOf()
+
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -3,6 +3,8 @@ package cc.hyperium.utils;
 import cc.hyperium.installer.api.entities.InstallerManifest;
 import cc.hyperium.installer.utils.JsonHolder;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -15,6 +17,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.MessageDigest;
+import java.util.Iterator;
 import java.util.Locale;
 
 /*
@@ -55,10 +58,6 @@ public class InstallerUtils {
         return os;
     }
 
-    public enum OSType {
-        Windows, MacOS, Linux, Other
-    }
-
     public static JsonHolder get(String url) {
         try {
             return new JsonHolder(getRaw(url));
@@ -77,8 +76,18 @@ public class InstallerUtils {
             Gson gson = new Gson();
 
             try {
-                InstallerManifest im = gson.fromJson(get("https://api.hyperium.cc/versions").getObject(), InstallerManifest.class);
-                manifest = new InstallerManifest(im.getLatest(), im.getVersions(), gson.fromJson(InstallerUtils.getRaw("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/installer/addons.json"), InstallerManifest.class).getAddons());
+                JsonHolder jsonHolder = get("https://api.hyperium.cc/versions");
+                JsonArray versions = jsonHolder.optJSONArray("versions");
+                Iterator<JsonElement> iterator = versions.iterator();
+                while (iterator.hasNext()) {
+                    JsonHolder jsonHolder1 = new JsonHolder(iterator.next().getAsJsonObject());
+                    if (jsonHolder1.optBoolean("beta")) {
+                        iterator.remove();
+                    }
+                }
+                InstallerManifest im = gson.fromJson(jsonHolder.getObject(), InstallerManifest.class);
+
+                manifest = new InstallerManifest(im.getLatest(), im.getLatest_beta(), im.getVersions(), gson.fromJson(InstallerUtils.getRaw("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/installer/addons.json"), InstallerManifest.class).getAddons());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -114,6 +123,10 @@ public class InstallerUtils {
 
     public static Class<?> loadClass(URL url, String c) throws ClassNotFoundException {
         return new URLClassLoader(new URL[]{url}).loadClass(c);
+    }
+
+    public enum OSType {
+        Windows, MacOS, Linux, Other
     }
 
 }
