@@ -374,7 +374,7 @@ public class Installer {
 
                 JsonHolder hyperiumJson = new JsonHolder();
                 JsonArray tweakers = new JsonArray();
-                tweakers.add(new JsonPrimitive("cc.hyperium.launch.LaunchTweaker"));
+                tweakers.add(new JsonPrimitive("cc.hyperium.launch.HyperiumTweaker"));
                 hyperiumJson.put("+tweakers", tweakers);
 
                 JsonArray libs = new JsonArray();
