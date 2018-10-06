@@ -374,7 +374,7 @@ public class Installer {
 
                 JsonHolder hyperiumJson = new JsonHolder();
                 JsonArray tweakers = new JsonArray();
-                tweakers.add(new JsonPrimitive("cc.hyperium.launch.LaunchTweaker"));
+                tweakers.add(new JsonPrimitive("cc.hyperium.launch.HyperiumTweaker"));
                 hyperiumJson.put("+tweakers", tweakers);
 
                 JsonArray libs = new JsonArray();
@@ -480,7 +480,11 @@ public class Installer {
             }
 
             phrase = Phrase.DONE;
-            callback.accept(new StatusCallback(phrase, "Installation success! Launch from your Minecraft launcher.", null));
+            if (mmc) {
+                callback.accept(new StatusCallback(phrase, "Installation success! Launch from your MultiMC launcher.", null));
+            } else {
+                callback.accept(new StatusCallback(phrase, "Installation success! Launch from your Minecraft launcher.", null));
+            }
             code = 0;
 
             if (!InstallerMain.INSTANCE.getLaunchCommand().isEmpty()) {
