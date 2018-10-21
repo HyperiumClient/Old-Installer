@@ -60,12 +60,17 @@ public class InstallerMain {
         if (args.length >= 1) {
             boolean local = args[0].equalsIgnoreCase("local");
 
-            if (args.length == 2) {
+            boolean forward = args[0].equalsIgnoreCase("fw");
+            StringBuilder fwCmd = new StringBuilder(); // for fast install being called by auto updater
+            if (args.length >= 2)
+                for (int i = 1; i < args.length; i++)
+                    fwCmd.append(args[i]).append(" ");
+
+            if (forward) {
                 // Installer has been called from the client.
-                String launchCommand = args[1];
-                INSTANCE.logger.info("LAUNCH COMMAND: " + launchCommand);
-                INSTANCE.setLaunchCommand(launchCommand);
-                INSTANCE.fastInstall(local);
+                INSTANCE.logger.info("LAUNCH COMMAND: " + fwCmd);
+                INSTANCE.setLaunchCommand(fwCmd.toString());
+                INSTANCE.fastInstall(false);
             } else {
                 // Installer has been called from the command line.
                 INSTANCE.init(local);
@@ -121,16 +126,13 @@ public class InstallerMain {
     }
 
     public void launchMinecraft() {
-        Thread launchThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println("Launching Minecraft!");
-                    Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
-                } catch (IOException e) {
-                    logger.info("Failed to launch Minecraft.");
-                    e.printStackTrace();
-                }
+        Thread launchThread = new Thread(() -> {
+            try {
+                System.out.println("Launching Minecraft!");
+                Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
+            } catch (IOException e) {
+                logger.info("Failed to launch Minecraft.");
+                e.printStackTrace();
             }
         });
         launchThread.start();
