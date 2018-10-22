@@ -65,12 +65,11 @@ public class InstallerMain {
             if (args.length >= 2)
                 for (int i = 1; i < args.length; i++)
                     fwCmd.append(args[i]).append(" ");
-
             if (forward) {
                 // Installer has been called from the client.
                 INSTANCE.logger.info("LAUNCH COMMAND: " + fwCmd);
                 INSTANCE.setLaunchCommand(fwCmd.toString());
-                INSTANCE.fastInstall(false);
+                INSTANCE.fastInstall(true);
             } else {
                 // Installer has been called from the command line.
                 INSTANCE.init(local);
