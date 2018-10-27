@@ -3,15 +3,7 @@ package cc.hyperium.installer;
 import cc.hyperium.installer.api.Installer;
 import cc.hyperium.installer.api.entities.InstallerConfig;
 import cc.hyperium.installer.api.entities.VersionManifest;
-import cc.hyperium.installer.steps.AddonsScreen;
-import cc.hyperium.installer.steps.InstallerStep;
-import cc.hyperium.installer.steps.InstallingScreen;
-import cc.hyperium.installer.steps.LoadingStep;
-import cc.hyperium.installer.steps.PrivacyScreen;
-import cc.hyperium.installer.steps.SettingsScreen;
-import cc.hyperium.installer.steps.TOSScreen;
-import cc.hyperium.installer.steps.VersionScreen;
-import cc.hyperium.installer.steps.WelcomeScreen;
+import cc.hyperium.installer.steps.*;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
 import cc.hyperium.utils.Multithreading;
@@ -187,6 +179,7 @@ public class InstallerMain {
         steps.addAll(Arrays.stream(new InstallerStep[]{
                 new LoadingStep(),
                 new WelcomeScreen(),
+                new MethodScreen(),
                 new SettingsScreen(),
                 local ? null : new VersionScreen(),
                 new AddonsScreen(),
