@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
@@ -143,14 +144,26 @@ public class Installer {
                 phrase = Phrase.VERIFY_CLIENT;
 
                 callback.accept(new StatusCallback(phrase, "Verifying client", null));
-                String hash;
-                hash = InstallerUtils.toHex(InstallerUtils.checksum(downloaded, "SHA-256")).toLowerCase();
+                byte[] checksumBytes;
+                try {
+                    checksumBytes = InstallerUtils.checksum(downloaded, "SHA-256");
+                } catch (IOException | NoSuchAlgorithmException e) {
+                    callback.accept(new ErrorCallback(e, phrase, "Unable to get SHA256 checksum of downloaded file."));
+                    return;
+                }
+                String hash = InstallerUtils.toHex(checksumBytes).toLowerCase();
                 InstallerMain.INSTANCE.getLogger().debug("SHA256 Hash = {}, Expected {}", hash, config.getVersion().getSha256());
                 if (!hash.equals(config.getVersion().getSha256())) {
                     callback.accept(new ErrorCallback(new IllegalStateException("SHA256 Hash does not match"), phrase, "Failed to verify the downloaded file, please try again."));
                     return;
                 }
-                hash = InstallerUtils.toHex(InstallerUtils.checksum(downloaded, "SHA1")).toLowerCase();
+                try {
+                    checksumBytes = InstallerUtils.checksum(downloaded, "SHA1");
+                } catch (IOException | NoSuchAlgorithmException e) {
+                    callback.accept(new ErrorCallback(e, phrase, "Unable to get SHA1 checksum of downloaded file."));
+                    return;
+                }
+                hash = InstallerUtils.toHex(checksumBytes).toLowerCase();
                 InstallerMain.INSTANCE.getLogger().debug("SHA1 Hash = {}, Expected {}", hash, config.getVersion().getSha1());
                 if (!hash.equals(config.getVersion().getSha1())) {
                     callback.accept(new ErrorCallback(new IllegalStateException("SHA1 Hash does not match"), phrase, "Failed to verify the downloaded file, please try again."));
