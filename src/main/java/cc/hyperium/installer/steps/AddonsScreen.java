@@ -126,7 +126,7 @@ public class AddonsScreen extends InstallerStep {
                     }
 
                     @Override
-                    public void mouseClicked(MouseEvent e) {
+                    public void mouseReleased(MouseEvent e) {
                         ensureDependencies();
                     }
                 });
