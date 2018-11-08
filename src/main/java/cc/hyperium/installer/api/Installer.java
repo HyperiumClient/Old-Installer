@@ -493,11 +493,7 @@ public class Installer {
             }
 
             phrase = Phrase.DONE;
-            if (mmc) {
-                callback.accept(new StatusCallback(phrase, "Installation success! Launch from your MultiMC launcher.", null));
-            } else {
-                callback.accept(new StatusCallback(phrase, "Installation success! Launch from your Minecraft launcher.", null));
-            }
+            callback.accept(new StatusCallback(phrase, "Installation success! Launch from your " + (mmc ? "MultiMC" : "Minecraft") + " launcher.", null));
             code = 0;
 
             if (!InstallerMain.INSTANCE.getLaunchCommand().isEmpty()) {
