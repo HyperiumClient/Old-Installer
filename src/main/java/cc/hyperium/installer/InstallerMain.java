@@ -73,19 +73,7 @@ public class InstallerMain {
     }
 
     private void fastInstall(boolean local) {
-        logger.info("Loading previous settings...");
-        File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
-
-        if (prev.exists()) {
-            try {
-                config = new Gson().fromJson(new String(Files.readAllBytes(prev.toPath()), Charset.defaultCharset()), InstallerConfig.class);
-            } catch (Exception ex) {
-                logger.error("Failed to load previous installer config", ex);
-                config = new InstallerConfig();
-            }
-        } else {
-            config = new InstallerConfig();
-        }
+        loadPreviousConfig();
 
         if (local) {
             config.setVersion(new VersionManifest("LOCAL", 0, "cc.hyperium:Hyperium:LOCAL", "", "", 0, 0, false, Installer.API_VERSION));
@@ -107,13 +95,7 @@ public class InstallerMain {
         // Start installing phase immediately.
         logger.info("Beginning installation...");
         initFrame();
-        InstallerStep installerStep = new InstallingScreen();
-        SwingUtilities.invokeLater(() -> {
-            frame.getContentPane().removeAll();
-            installerStep.modifyFrame(frame);
-            installerStep.addComponents(frame.getContentPane());
-            frame.repaint();
-        });
+        renderStep(new InstallingScreen());
     }
 
     public void launchMinecraft() {
@@ -161,18 +143,7 @@ public class InstallerMain {
                 pass.set(true);
         });
 
-        logger.info("Loading previous settings...");
-        File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
-        if (prev.exists()) {
-            try {
-                config = new Gson().fromJson(new String(Files.readAllBytes(prev.toPath()), Charset.defaultCharset()), InstallerConfig.class);
-            } catch (Exception ex) {
-                logger.error("Failed to load previous installer config", ex);
-                config = new InstallerConfig();
-            }
-        } else {
-            config = new InstallerConfig();
-        }
+        loadPreviousConfig();
 
         logger.debug("Local = {}", local);
         logger.info("Starting installer...");
@@ -235,13 +206,31 @@ public class InstallerMain {
 
     public void next() {
         if (steps.isEmpty()) return;
-        InstallerStep step = steps.poll();
+        renderStep(steps.poll());
+    }
+
+    private void renderStep(InstallerStep installerStep) {
         SwingUtilities.invokeLater(() -> {
             frame.getContentPane().removeAll();
-            step.modifyFrame(frame);
-            step.addComponents(frame.getContentPane());
+            installerStep.modifyFrame(frame);
+            installerStep.addComponents(frame.getContentPane());
             frame.repaint();
         });
+    }
+
+    private void loadPreviousConfig() {
+        logger.info("Loading previous settings...");
+        File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
+        if (prev.exists()) {
+            try {
+                config = new Gson().fromJson(new String(Files.readAllBytes(prev.toPath()), Charset.defaultCharset()), InstallerConfig.class);
+            } catch (Exception ex) {
+                logger.error("Failed to load previous installer config", ex);
+                config = new InstallerConfig();
+            }
+        } else {
+            config = new InstallerConfig();
+        }
     }
 
     public JFrame getFrame() {
