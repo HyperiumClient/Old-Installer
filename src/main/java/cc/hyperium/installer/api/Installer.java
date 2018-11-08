@@ -121,7 +121,7 @@ public class Installer {
                 File downloaded;
                 try {
                     File dest = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + " (" + config.getVersion().getId() + ")" + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
-                    ;
+
                     File dir = dest.getParentFile();
                     InstallerMain.INSTANCE.getLogger().debug("Target directory: {}", dir.getAbsolutePath());
                     dir.mkdirs();
