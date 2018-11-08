@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.util.Iterator;
 import java.util.Locale;
@@ -68,7 +69,7 @@ public class InstallerUtils {
     }
 
     public static String getRaw(String url) throws IOException {
-        return IOUtils.toString(client.execute(new HttpGet(url)).getEntity().getContent());
+        return IOUtils.toString(client.execute(new HttpGet(url)).getEntity().getContent(), Charset.defaultCharset());
     }
 
     public static InstallerManifest getManifest() {
