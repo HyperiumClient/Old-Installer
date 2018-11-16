@@ -24,7 +24,13 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.time.Instant;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
 
@@ -32,7 +38,7 @@ import java.util.jar.JarFile;
  * Created by Cubxity on 06/07/2018
  */
 public class Installer {
-    public static final int API_VERSION = 3;
+    public static final int API_VERSION = 4;
 
     private final InstallerConfig config;
 
@@ -87,7 +93,8 @@ public class Installer {
                 }
 
 
-            if (config.getVersion().getName().equals("LOCAL")) {
+            boolean local1 = config.getVersion().getName().equals("LOCAL");
+            if (local1) {
                 phrase = Phrase.COPY_VERSION;
                 File local;
 
@@ -113,7 +120,7 @@ public class Installer {
                 phrase = Phrase.DOWNLOAD_CLIENT;
                 File downloaded;
                 try {
-                    File dest = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
+                    File dest = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + " (" + config.getVersion().getId() + ")" + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
                     ;
                     File dir = dest.getParentFile();
                     InstallerMain.INSTANCE.getLogger().debug("Target directory: {}", dir.getAbsolutePath());
@@ -367,13 +374,13 @@ public class Installer {
 
                 JsonHolder hyperiumJson = new JsonHolder();
                 JsonArray tweakers = new JsonArray();
-                tweakers.add(new JsonPrimitive("cc.hyperium.launch.LaunchTweaker"));
+                tweakers.add(new JsonPrimitive("cc.hyperium.launch.HyperiumTweaker"));
                 hyperiumJson.put("+tweakers", tweakers);
 
                 JsonArray libs = new JsonArray();
                 libs.add(
                         new JsonHolder()
-                                .put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName())
+                                .put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName() + " (" + config.getVersion().getId() + ")")
                                 .put("MMC-hint", "local")
                                 .getObject()
                 );
@@ -424,7 +431,7 @@ public class Installer {
                     return;
                 }
                 JsonHolder lib = new JsonHolder();
-                lib.put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName());
+                lib.put("name", "cc.hyperium:Hyperium:" + config.getVersion().getName() + (local1 ? "" : " (" + config.getVersion().getId() + ")"));
                 JsonArray libs = json.optJSONArray("libraries");
                 libs.add(lib.getObject());
                 libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:Hyperium").getObject());
@@ -473,10 +480,14 @@ public class Installer {
             }
 
             phrase = Phrase.DONE;
-            callback.accept(new StatusCallback(phrase, "Installation success! Launch from your Minecraft launcher.", null));
+            if (mmc) {
+                callback.accept(new StatusCallback(phrase, "Installation success! Launch from your MultiMC launcher.", null));
+            } else {
+                callback.accept(new StatusCallback(phrase, "Installation success! Launch from your Minecraft launcher.", null));
+            }
             code = 0;
 
-            if(!InstallerMain.INSTANCE.getLaunchCommand().isEmpty()){
+            if (!InstallerMain.INSTANCE.getLaunchCommand().isEmpty()) {
                 InstallerMain.INSTANCE.launchMinecraft();
             }
         } catch (Exception ex) {

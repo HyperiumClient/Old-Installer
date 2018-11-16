@@ -3,15 +3,7 @@ package cc.hyperium.installer;
 import cc.hyperium.installer.api.Installer;
 import cc.hyperium.installer.api.entities.InstallerConfig;
 import cc.hyperium.installer.api.entities.VersionManifest;
-import cc.hyperium.installer.steps.AddonsScreen;
-import cc.hyperium.installer.steps.InstallerStep;
-import cc.hyperium.installer.steps.InstallingScreen;
-import cc.hyperium.installer.steps.LoadingStep;
-import cc.hyperium.installer.steps.PrivacyScreen;
-import cc.hyperium.installer.steps.SettingsScreen;
-import cc.hyperium.installer.steps.TOSScreen;
-import cc.hyperium.installer.steps.VersionScreen;
-import cc.hyperium.installer.steps.WelcomeScreen;
+import cc.hyperium.installer.steps.*;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
 import cc.hyperium.utils.Multithreading;
@@ -60,12 +52,16 @@ public class InstallerMain {
         if (args.length >= 1) {
             boolean local = args[0].equalsIgnoreCase("local");
 
-            if (args.length == 2) {
+            boolean forward = args[0].equalsIgnoreCase("fw");
+            StringBuilder fwCmd = new StringBuilder(); // for fast install being called by auto updater
+            if (args.length >= 2)
+                for (int i = 1; i < args.length; i++)
+                    fwCmd.append(args[i]).append(" ");
+            if (forward) {
                 // Installer has been called from the client.
-                String launchCommand = args[1];
-                INSTANCE.logger.info("LAUNCH COMMAND: " + launchCommand);
-                INSTANCE.setLaunchCommand(launchCommand);
-                INSTANCE.fastInstall(local);
+                INSTANCE.logger.info("LAUNCH COMMAND: " + fwCmd);
+                INSTANCE.setLaunchCommand(fwCmd.toString());
+                INSTANCE.fastInstall(true);
             } else {
                 // Installer has been called from the command line.
                 INSTANCE.init(local);
@@ -121,16 +117,13 @@ public class InstallerMain {
     }
 
     public void launchMinecraft() {
-        Thread launchThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println("Launching Minecraft!");
-                    Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
-                } catch (IOException e) {
-                    logger.info("Failed to launch Minecraft.");
-                    e.printStackTrace();
-                }
+        Thread launchThread = new Thread(() -> {
+            try {
+                System.out.println("Launching Minecraft!");
+                Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
+            } catch (IOException e) {
+                logger.info("Failed to launch Minecraft.");
+                e.printStackTrace();
             }
         });
         launchThread.start();
@@ -186,6 +179,7 @@ public class InstallerMain {
         steps.addAll(Arrays.stream(new InstallerStep[]{
                 new LoadingStep(),
                 new WelcomeScreen(),
+                new MethodScreen(),
                 new SettingsScreen(),
                 local ? null : new VersionScreen(),
                 new AddonsScreen(),
