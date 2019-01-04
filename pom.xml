@@ -6,7 +6,7 @@
 
     <groupId>cc.hyperium.installer</groupId>
     <artifactId>Installer</artifactId>
-    <version>1.8</version>
+    <version>1.9</version>
 
     <properties>
         <kotlin.version>1.2.50</kotlin.version>
@@ -144,7 +144,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>17.0</version>
+            <version>24.1.1-jre</version>
         </dependency>
         <dependency>
             <groupId>com.github.Cubxity</groupId>
