@@ -126,7 +126,7 @@ public class AddonsScreen extends InstallerStep {
                     }
 
                     @Override
-                    public void mouseClicked(MouseEvent e) {
+                    public void mouseReleased(MouseEvent e) {
                         ensureDependencies();
                     }
                 });
@@ -134,7 +134,7 @@ public class AddonsScreen extends InstallerStep {
                 rb.setHorizontalAlignment(SwingConstants.LEFT);
                 rb.setBackground(Colors.DARK.brighter());
                 rb.addActionListener(e -> {
-                    if (rb.isSelected() && !ic.getComponents().contains(a))
+                    if (rb.isSelected() && !ic.getComponents().contains(a.getName()))
                         ic.getComponents().add(a.getName());
                     else if (!rb.isSelected())
                         ic.getComponents().remove(a.getName());

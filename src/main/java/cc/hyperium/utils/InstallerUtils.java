@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Locale;
 
@@ -68,7 +70,7 @@ public class InstallerUtils {
     }
 
     public static String getRaw(String url) throws IOException {
-        return IOUtils.toString(client.execute(new HttpGet(url)).getEntity().getContent());
+        return IOUtils.toString(client.execute(new HttpGet(url)).getEntity().getContent(), Charset.defaultCharset());
     }
 
     public static InstallerManifest getManifest() {
@@ -95,19 +97,15 @@ public class InstallerUtils {
         return manifest;
     }
 
-    public static byte[] checksum(File input, String name) {
-        try (InputStream in = new FileInputStream(input)) {
-            MessageDigest digest = MessageDigest.getInstance(name);
-            byte[] block = new byte[4096];
-            int length;
-            while ((length = in.read(block)) > 0) {
-                digest.update(block, 0, length);
-            }
-            return digest.digest();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static byte[] checksum(File input, String name) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance(name);
+        InputStream in = new FileInputStream(input);
+        byte[] block = new byte[4096];
+        int length;
+        while ((length = in.read(block)) > 0) {
+            digest.update(block, 0, length);
         }
-        return null;
+        return digest.digest();
     }
 
     public static String toHex(byte[] bytes) {

@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
@@ -121,7 +122,7 @@ public class Installer {
                 File downloaded;
                 try {
                     File dest = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + " (" + config.getVersion().getId() + ")" + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
-                    ;
+
                     File dir = dest.getParentFile();
                     InstallerMain.INSTANCE.getLogger().debug("Target directory: {}", dir.getAbsolutePath());
                     dir.mkdirs();
@@ -143,14 +144,26 @@ public class Installer {
                 phrase = Phrase.VERIFY_CLIENT;
 
                 callback.accept(new StatusCallback(phrase, "Verifying client", null));
-                String hash;
-                hash = InstallerUtils.toHex(InstallerUtils.checksum(downloaded, "SHA-256")).toLowerCase();
+                byte[] checksumBytes;
+                try {
+                    checksumBytes = InstallerUtils.checksum(downloaded, "SHA-256");
+                } catch (IOException | NoSuchAlgorithmException e) {
+                    callback.accept(new ErrorCallback(e, phrase, "Unable to get SHA256 checksum of downloaded file."));
+                    return;
+                }
+                String hash = InstallerUtils.toHex(checksumBytes).toLowerCase();
                 InstallerMain.INSTANCE.getLogger().debug("SHA256 Hash = {}, Expected {}", hash, config.getVersion().getSha256());
                 if (!hash.equals(config.getVersion().getSha256())) {
                     callback.accept(new ErrorCallback(new IllegalStateException("SHA256 Hash does not match"), phrase, "Failed to verify the downloaded file, please try again."));
                     return;
                 }
-                hash = InstallerUtils.toHex(InstallerUtils.checksum(downloaded, "SHA1")).toLowerCase();
+                try {
+                    checksumBytes = InstallerUtils.checksum(downloaded, "SHA1");
+                } catch (IOException | NoSuchAlgorithmException e) {
+                    callback.accept(new ErrorCallback(e, phrase, "Unable to get SHA1 checksum of downloaded file."));
+                    return;
+                }
+                hash = InstallerUtils.toHex(checksumBytes).toLowerCase();
                 InstallerMain.INSTANCE.getLogger().debug("SHA1 Hash = {}, Expected {}", hash, config.getVersion().getSha1());
                 if (!hash.equals(config.getVersion().getSha1())) {
                     callback.accept(new ErrorCallback(new IllegalStateException("SHA1 Hash does not match"), phrase, "Failed to verify the downloaded file, please try again."));
@@ -480,11 +493,7 @@ public class Installer {
             }
 
             phrase = Phrase.DONE;
-            if (mmc) {
-                callback.accept(new StatusCallback(phrase, "Installation success! Launch from your MultiMC launcher.", null));
-            } else {
-                callback.accept(new StatusCallback(phrase, "Installation success! Launch from your Minecraft launcher.", null));
-            }
+            callback.accept(new StatusCallback(phrase, "Installation success! Launch from your " + (mmc ? "MultiMC" : "Minecraft") + " launcher.", null));
             code = 0;
 
             if (!InstallerMain.INSTANCE.getLaunchCommand().isEmpty()) {
