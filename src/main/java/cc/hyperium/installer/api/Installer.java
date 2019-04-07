@@ -320,6 +320,7 @@ public class Installer {
                     }
                 prop.setProperty("name", "Hyperium 1.8.9");
                 prop.setProperty("InstanceType", "OneSix");
+                prop.setProperty("JvmArgs", "-Duser.country=US -Duser.language=en");
                 prop.setProperty("MaxMemAlloc", String.valueOf(config.getWam() * 1024));
                 prop.setProperty("MinMemAlloc", "512");
                 prop.setProperty("iconKey", "hyperium");
@@ -469,7 +470,7 @@ public class Installer {
                         .put("created", instant.toString())
                         .put("lastUsed", instant.toString())
                         .put("lastVersionId", "Hyperium 1.8.9")
-                        .put("javaArgs", "-Xms512M -Xmx" + config.getWam() + "G")
+                        .put("javaArgs", "-Duser.country=US -Duser.language=en -Xms512M -Xmx" + config.getWam() + "G") // forces default locale to english so there's no locale problems with mixins
                         .put("icon", InstallerUtils.ICON_BASE64);
                 if (config.getLocalJre())
                     if (System.getProperty("java.version").startsWith("1.8"))
