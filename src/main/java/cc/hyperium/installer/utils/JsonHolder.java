@@ -21,15 +21,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * @author Sk1er
- */
 @SuppressWarnings("unused")
 public class JsonHolder {
     private JsonObject object = new JsonObject();
@@ -188,7 +184,6 @@ public class JsonHolder {
         return optInt(key, 0);
     }
 
-
     public String optString(String key, String fallBack) {
         try {
             return object.get(key).getAsString();
@@ -201,7 +196,6 @@ public class JsonHolder {
         return optString(key, "");
     }
 
-
     public double optDouble(String key, double fallBack) {
         try {
             return object.get(key).getAsDouble();
@@ -210,8 +204,6 @@ public class JsonHolder {
         }
     }
 
-    //modgame add bw_4 2 4 `Bedwars 4 Team` Bedwars
-    //modgame rm Bedwars
     public List<String> getKeys() {
         return object.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
     }
@@ -219,7 +211,6 @@ public class JsonHolder {
     public double optDouble(String key) {
         return optDouble(key, 0.0);
     }
-
 
     public JsonObject getObject() {
         return object;
