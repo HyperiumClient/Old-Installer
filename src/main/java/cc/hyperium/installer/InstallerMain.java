@@ -10,7 +10,6 @@ import cc.hyperium.utils.Multithreading;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -34,9 +33,6 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-/*
- * Created by Cubxity on 05/07/2018
- */
 public class InstallerMain {
     public static final InstallerMain INSTANCE = new InstallerMain();
     private final Queue<InstallerStep> steps = new ArrayDeque<>();
@@ -101,10 +97,8 @@ public class InstallerMain {
     public void launchMinecraft() {
         Thread launchThread = new Thread(() -> {
             try {
-                System.out.println("Launching Minecraft!");
                 Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
             } catch (IOException e) {
-                logger.info("Failed to launch Minecraft.");
                 e.printStackTrace();
             }
         });
@@ -133,8 +127,6 @@ public class InstallerMain {
         System.setErr(logStream);
 
         AtomicBoolean pass = new AtomicBoolean(false);
-        logger.debug("Java version: " + System.getProperty("java.version"));
-        logger.info("Loading launcher manifest asynchronously...");
         Multithreading.runAsync(() -> {
             InstallerUtils.getManifest();
             if (frame != null && frame.getContentPane().getComponents().length == 2)
@@ -181,7 +173,7 @@ public class InstallerMain {
             UIManager.setLookAndFeel(new MetalLookAndFeel());
         } catch (Exception ignored) {
         }
-        frame = new JFrame("Hyperium Installer");
+        frame = new JFrame("HyperiumJailbreak Installer");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         try {
             frame.setIconImage(ImageIO.read(getClass().getResourceAsStream("/icons/hyperium.png")));
