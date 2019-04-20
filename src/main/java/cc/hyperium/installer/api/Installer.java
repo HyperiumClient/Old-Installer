@@ -16,7 +16,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import me.cubxity.asm.LaunchWrapperPatcher;
 import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -35,9 +34,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
 
-/*
- * Created by Cubxity on 06/07/2018
- */
 public class Installer {
     public static final int API_VERSION = 4;
 
@@ -433,7 +429,6 @@ public class Installer {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to add hyperium icon"));
                     return;
                 }
-
             } else {
                 JsonHolder json;
                 JsonHolder launcherProfiles;
