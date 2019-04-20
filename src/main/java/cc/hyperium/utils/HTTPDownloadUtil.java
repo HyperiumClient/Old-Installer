@@ -26,25 +26,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HTTPDownloadUtil {
-
     private static final Pattern FILENAME = Pattern.compile("filename=(?<name>\\S+)");
 
     private HttpURLConnection httpConn;
 
-    /**
-     * hold input stream of HttpURLConnection
-     */
     private InputStream inputStream;
 
     private String fileName;
     private int contentLength;
 
-    /**
-     * Downloads a file from a URL
-     *
-     * @param fileURL HTTP URL of the file to be downloaded
-     * @throws IOException If it fails
-     */
     public void downloadFile(String fileURL) throws IOException {
         URL url = new URL(fileURL);
         httpConn = (HttpURLConnection) url.openConnection();
