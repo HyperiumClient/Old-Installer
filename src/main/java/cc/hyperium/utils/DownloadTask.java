@@ -33,9 +33,6 @@ public class DownloadTask extends SwingWorker<Void, Void> {
         this.saveDirectory = saveDirectory;
     }
 
-    /**
-     * Executed in background thread
-     */
     @Override
     protected Void doInBackground() throws Exception {
         HTTPDownloadUtil util = new HTTPDownloadUtil();
@@ -66,13 +63,8 @@ public class DownloadTask extends SwingWorker<Void, Void> {
         return null;
     }
 
-    /**
-     * Executed in Swing's event dispatching thread
-     */
     @Override
-    protected void done() {
-
-    }
+    protected void done() {}
 
     public String getFileName() {
         return fileName;
