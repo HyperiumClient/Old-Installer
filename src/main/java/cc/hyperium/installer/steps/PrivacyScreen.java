@@ -17,9 +17,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Rectangle;
 
-/*
- * Created by Cubxity on 09/07/2018
- */
 public class PrivacyScreen extends InstallerStep {
     @Override
     public void addComponents(Container c) {

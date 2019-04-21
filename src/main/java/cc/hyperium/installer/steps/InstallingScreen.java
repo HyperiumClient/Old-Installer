@@ -68,7 +68,7 @@ public class InstallingScreen extends InstallerStep {
             Installer in = new Installer(InstallerMain.INSTANCE.getConfig(), null);
             in.setCallback(callback -> {
                 if (in.getCode() == 0) {
-                    title.setText("Installation success"); // prevent issues
+                    title.setText("Installation success");
                     return;
                 }
                 title.setText(callback.getMessage());

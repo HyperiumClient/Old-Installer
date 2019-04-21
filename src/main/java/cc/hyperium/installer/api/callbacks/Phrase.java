@@ -3,7 +3,6 @@ package cc.hyperium.installer.api.callbacks;
 public enum Phrase {
     PRE,
     COPY_VERSION,
-    COPY_LOCAL,
     DOWNLOAD_CLIENT,
     VERIFY_CLIENT,
     DOWNLOAD_COMPONENTS,

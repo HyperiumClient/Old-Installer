@@ -2,15 +2,11 @@ package cc.hyperium.installer.components;
 
 import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.utils.Colors;
-
 import javax.swing.JButton;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-/*
- * Created by Cubxity on 05/07/2018
- */
 public class FlatButton extends JButton {
     public FlatButton() {
         this(true);

@@ -12,9 +12,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-/*
- * Created by Cubxity on 05/07/2018
- */
 public class SettingsScreen extends InstallerStep {
     @Override
     public void addComponents(Container c) {

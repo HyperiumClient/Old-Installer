@@ -9,9 +9,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
-/*
- * Created by Cubxity on 08/07/2018
- */
 public class HScrollBarUI extends MetalScrollBarUI {
     private JButton zero() {
         JButton b = new JButton();

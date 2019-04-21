@@ -140,7 +140,6 @@ public class InstallerMain {
                 new SettingsScreen(),
                 local ? null : new VersionScreen(),
                 new AddonsScreen(),
-                new TOSScreen(),
                 new PrivacyScreen(),
                 new InstallingScreen()
         }).filter(Objects::nonNull).collect(Collectors.toList()));

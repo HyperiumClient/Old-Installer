@@ -8,9 +8,6 @@ import javax.swing.ListCellRenderer;
 import java.awt.Color;
 import java.awt.Component;
 
-/*
- * Created by Cubxity on 06/07/2018
- */
 public class ComboBoxRenderer extends JLabel implements ListCellRenderer<String> {
     public ComboBoxRenderer() {
         setOpaque(true);

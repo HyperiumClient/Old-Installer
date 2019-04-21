@@ -11,9 +11,6 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 
-/*
- * Created by Cubxity on 06/07/2018
- */
 public class SliderUI extends BasicSliderUI {
     private final Stroke s = new BasicStroke(1f);
 
