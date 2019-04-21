@@ -49,13 +49,12 @@ public class InstallerMain {
             boolean local = args[0].equalsIgnoreCase("local");
 
             boolean forward = args[0].equalsIgnoreCase("fw");
-            StringBuilder fwCmd = new StringBuilder(); // for fast install being called by auto updater
+            StringBuilder fwCmd = new StringBuilder();
             if (args.length >= 2)
                 for (int i = 1; i < args.length; i++)
                     fwCmd.append(args[i]).append(" ");
             if (forward) {
                 // Installer has been called from the client.
-                INSTANCE.logger.info("LAUNCH COMMAND: " + fwCmd);
                 INSTANCE.setLaunchCommand(fwCmd.toString());
                 INSTANCE.fastInstall(true);
             } else {
@@ -80,11 +79,8 @@ public class InstallerMain {
             font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(15f);
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
-            font = new Font("Arial", Font.PLAIN, 15); //Fallback
+            font = new Font("Arial", Font.PLAIN, 15);
         }
-
-        System.out.println("Config INFO: ");
-        System.out.println("Version: " + INSTANCE.getConfig().getVersion());
 
         title = font.deriveFont(50f);
 
@@ -137,8 +133,6 @@ public class InstallerMain {
 
         loadPreviousConfig();
 
-        logger.debug("Local = {}", local);
-        logger.info("Starting installer...");
         steps.addAll(Arrays.stream(new InstallerStep[]{
                 new LoadingStep(),
                 new WelcomeScreen(),
@@ -156,10 +150,9 @@ public class InstallerMain {
             font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(15f);
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
-            font = new Font("Arial", Font.PLAIN, 15); //Fallback
+            font = new Font("Arial", Font.PLAIN, 15);
         }
         title = font.deriveFont(50f);
-        logger.info("Initializing frame...");
         SwingUtilities.invokeLater(() -> {
             initFrame();
             if (pass.get())
@@ -168,7 +161,6 @@ public class InstallerMain {
     }
 
     private void initFrame() {
-        logger.info("Initialing frame...");
         try {
             UIManager.setLookAndFeel(new MetalLookAndFeel());
         } catch (Exception ignored) {
@@ -211,7 +203,6 @@ public class InstallerMain {
     }
 
     private void loadPreviousConfig() {
-        logger.info("Loading previous settings...");
         File prev = new File(System.getProperty("user.home"), "hinstaller-state.json");
         if (prev.exists()) {
             try {
