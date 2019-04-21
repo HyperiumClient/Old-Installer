@@ -2,9 +2,6 @@ package cc.hyperium.installer.api.entities
 
 import java.util.*
 
-/*
- * Created by Cubxity on 06/07/2018
- */
 data class InstallerManifest(
         val latest: VersionManifest,
         val latest_beta: VersionManifest,
@@ -31,5 +28,4 @@ data class InstallerManifest(
         result = 31 * result + addons.hashCode()
         return result
     }
-
 }
