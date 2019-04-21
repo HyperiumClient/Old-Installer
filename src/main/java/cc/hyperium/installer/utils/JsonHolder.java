@@ -46,7 +46,6 @@ public class JsonHolder {
             this.object = new JsonObject();
             this.parsedCorrectly = false;
             e.printStackTrace();
-
         }
     }
 
@@ -130,7 +129,6 @@ public class JsonHolder {
         return optJSONArray(key, new JsonArray());
     }
 
-
     public boolean has(String key) {
         return object.has(key);
     }
@@ -170,7 +168,6 @@ public class JsonHolder {
     public JsonHolder optJSONObject(String key) {
         return optJSONObject(key, new JsonObject());
     }
-
 
     public int optInt(String key, int fallBack) {
         try {
@@ -241,13 +238,10 @@ public class JsonHolder {
     public List<String> getJsonArrayAsStringList(String root) {
         List<String> strings = new ArrayList<>();
         try {
-
             for (JsonElement element : object.get(root).getAsJsonArray()) {
                 strings.add(element.getAsString());
             }
-        } catch (Exception ignored) {
-
-        }
+        } catch (Exception ignored) {}
         return strings;
     }
 }
