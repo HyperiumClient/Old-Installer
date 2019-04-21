@@ -168,23 +168,19 @@ public class Installer {
             }
 
             File optifine = null;
-            boolean of = config.getComponents().stream().anyMatch(c -> c.equals("Optifine"));
-            if (of) {
-                phrase = Phrase.DOWNLOAD_COMPONENTS;
-                callback.accept(new StatusCallback(phrase, "Downloading Optifine", null));
-                File tmpDir = java.nio.file.Files.createTempDirectory("Hyperium").toFile();
-                try {
-                    DownloadTask dl = new DownloadTask("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/files/mods/OptiFine_1.8.9_HD_U_I7.jar", tmpDir.getAbsolutePath());
-                    dl.addPropertyChangeListener(evt -> {
-                        if (evt.getNewValue() instanceof Integer)
-                            callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, "Downloading Optifine (" + evt.getNewValue() + "%)", null));
-                    });
+            phrase = Phrase.DOWNLOAD_COMPONENTS;
+            callback.accept(new StatusCallback(phrase, "Downloading OptiFine", null));
+            File tmpDir = java.nio.file.Files.createTempDirectory("Hyperium").toFile();
+            try {
+                DownloadTask dl = new DownloadTask("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/files/mods/OptiFine_1.8.9_HD_U_I7.jar", tmpDir.getAbsolutePath());
+                dl.addPropertyChangeListener(evt -> {
+                    if (evt.getNewValue() instanceof Integer) callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, "Downloading OptiFine (" + evt.getNewValue() + "%)", null));
+                });
                     dl.execute();
                     dl.get();
                     optifine = new File(tmpDir, dl.getFileName());
-                } catch (Exception ex) {
-                    callback.accept(new ErrorCallback(ex, phrase, "Failed to download Optifine: " + ex.getMessage()));
-                }
+            } catch (Exception ex) {
+                callback.accept(new ErrorCallback(ex, phrase, "Failed to download OptiFine: " + ex.getMessage()));
             }
 
             File targetJson = new File(target, "Hyperium 1.8.9.json");
@@ -201,23 +197,21 @@ public class Installer {
                 }
             }
 
-            if (of) {
-                try {
-                    phrase = Phrase.PATCH_OPTIFINE;
-                    callback.accept(new StatusCallback(phrase, "Patching Optifine", null));
-                    File optifineLibDir = new File(libraries, sep + "optifine" + sep + "OptiFine" + sep + "1.8.9_HD_U_I7");
-                    optifineLibDir.mkdirs();
-                    File optifineLib = new File(optifineLibDir, "OptiFine-1.8.9_HD_U_I7.jar");
-
-                    Class<?> patcher = InstallerUtils.loadClass(optifine.toURI().toURL(), "optifine.Patcher");
-                    Method main = patcher.getMethod("main", String[].class);
-                    main.invoke(null, new Object[]{new String[]{originJar.getAbsolutePath(), optifine.getAbsolutePath(), optifineLib.getAbsolutePath()}});
-                } catch (Exception ex) {
-                    callback.accept(new ErrorCallback(ex, phrase, "Failed to patch Optifine: " + ex.getMessage()));
-                    return;
-                }
-                optifine.delete();
+            try {
+                phrase = Phrase.PATCH_OPTIFINE;
+                callback.accept(new StatusCallback(phrase, "Patching Optifine", null));
+                File optifineLibDir = new File(libraries, sep + "optifine" + sep + "OptiFine" + sep + "1.8.9_HD_U_I7");
+                optifineLibDir.mkdirs();
+                File optifineLib = new File(optifineLibDir, "OptiFine-1.8.9_HD_U_I7.jar");
+                
+                Class<?> patcher = InstallerUtils.loadClass(optifine.toURI().toURL(), "optifine.Patcher");
+                Method main = patcher.getMethod("main", String[].class);
+                main.invoke(null, new Object[]{new String[]{originJar.getAbsolutePath(), optifine.getAbsolutePath(), optifineLib.getAbsolutePath()}});
+            } catch (Exception ex) {
+                callback.accept(new ErrorCallback(ex, phrase, "Failed to patch OptiFine: " + ex.getMessage()));
+                return;
             }
+            optifine.delete();
 
             phrase = Phrase.DOWNLOAD_COMPONENTS;
             Map<File, AddonManifest> installedAddons = new HashMap<>();
@@ -400,13 +394,12 @@ public class Installer {
                                 .put("MMC-hint", "local")
                                 .getObject()
                 );
-                if (of)
-                    libs.add(
-                            new JsonHolder()
-                                    .put("name", "optifine:OptiFine:1.8.9_HD_U_I7")
-                                    .put("MMC-hint", "local")
-                                    .getObject()
-                    );
+                libs.add(
+                        new JsonHolder()
+                                 .put("name", "optifine:OptiFine:1.8.9_HD_U_I7")
+                                 .put("MMC-hint", "local")
+                                 .getObject()
+                );
                 hyperiumJson.put("libraries", libs);
                 hyperiumJson.put("mainClass", "net.minecraft.launchwrapper.Launch");
                 hyperiumJson.put("name", "Hyperium");
@@ -444,8 +437,7 @@ public class Installer {
                 JsonArray libs = json.optJSONArray("libraries");
                 libs.add(lib.getObject());
                 libs.add(new JsonHolder().put("name", "net.minecraft:launchwrapper:Hyperium").getObject());
-                if (of)
-                    libs.add(new JsonHolder().put("name", "optifine:OptiFine:1.8.9_HD_U_I7").getObject());
+                libs.add(new JsonHolder().put("name", "optifine:OptiFine:1.8.9_HD_U_I7").getObject());
                 json.put("libraries", libs);
                 json.put("id", "Hyperium 1.8.9");
                 json.put("mainClass", "net.minecraft.launchwrapper.Launch");
