@@ -8,7 +8,6 @@ import cc.hyperium.installer.components.MotionPanel;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.Multithreading;
 import com.google.gson.Gson;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -17,9 +16,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
-/*
- * Created by Cubxity on 08/07/2018
- */
 public class InstallingScreen extends InstallerStep {
     @Override
     public void addComponents(Container c) {
