@@ -2,9 +2,6 @@ package cc.hyperium.installer.api.entities
 
 import java.util.Arrays
 
-/*
- * Created by Cubxity on 06/07/2018
- */
 class AddonManifest(
         val name: String,
         val description: String,
