@@ -2,9 +2,6 @@ package cc.hyperium.installer.api.entities
 
 import com.google.gson.annotations.SerializedName
 
-/*
- * Created by Cubxity on 06/07/2018
- */
 data class
         VersionManifest(
         @SerializedName("build")
