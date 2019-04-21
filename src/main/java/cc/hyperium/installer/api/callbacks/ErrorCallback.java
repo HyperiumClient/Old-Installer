@@ -1,8 +1,5 @@
 package cc.hyperium.installer.api.callbacks;
 
-/*
- * Created by Cubxity on 08/07/2018
- */
 public class ErrorCallback extends AbstractCallback {
     private final String message;
     private final Exception error;
