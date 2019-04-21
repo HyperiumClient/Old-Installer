@@ -8,7 +8,6 @@ import cc.hyperium.installer.components.FlatButton;
 import cc.hyperium.installer.components.FlatRadioButton;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -22,9 +21,6 @@ import java.awt.Image;
 import java.io.IOException;
 import java.util.Arrays;
 
-/*
- * Created by Cubxity on 06/07/2018
- */
 public class VersionScreen extends InstallerStep {
     @Override
     public void addComponents(Container c) {
