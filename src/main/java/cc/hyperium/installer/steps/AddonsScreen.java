@@ -9,7 +9,6 @@ import cc.hyperium.installer.components.HScrollBarUI;
 import cc.hyperium.installer.components.VScrollBarUI;
 import cc.hyperium.utils.Colors;
 import cc.hyperium.utils.InstallerUtils;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -29,9 +28,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-/*
- * Created by Cubxity on 08/07/2018
- */
 public class AddonsScreen extends InstallerStep {
     private final HashMap<JRadioButton, String[]> dependencies = new HashMap<>();
 
@@ -78,34 +74,7 @@ public class AddonsScreen extends InstallerStep {
         cDesc.setBounds(c.getWidth() / 2 + 5, c.getHeight() / 4 + 23, w, c.getHeight() / 2 - 23);
         cDesc.setLineWrap(true);
         cDesc.setWrapStyleWord(true);
-
-        JRadioButton of = new FlatRadioButton("Optifine");
-        of.setVerticalAlignment(SwingConstants.TOP);
-        of.setHorizontalAlignment(SwingConstants.LEFT);
-        of.setBackground(Colors.DARK.brighter());
-        of.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                cLabel.setText("Components");
-                cDesc.setText("Select the components you'd like to install");
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                cLabel.setText("Optifine");
-                cDesc.setText("Optifine is a Minecraft optimization mod.\n" +
-                        "It allows Minecraft to run faster and look better with full support for HD textures and adds many configuration options.");
-            }
-        });
         InstallerConfig ic = InstallerMain.INSTANCE.getConfig();
-        of.addActionListener(e -> {
-            if (of.isSelected() && !ic.getComponents().contains("Optifine"))
-                ic.getComponents().add("Optifine");
-            else if (!of.isSelected())
-                ic.getComponents().remove("Optifine");
-        });
-        of.setSelected(InstallerMain.INSTANCE.getConfig().getComponents().stream().anyMatch(cm -> cm.equals("Optifine")));
-        cView.add(of);
 
         try {
             for (AddonManifest a : InstallerUtils.getManifest().getAddons()) {
