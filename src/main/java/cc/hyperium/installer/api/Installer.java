@@ -172,7 +172,7 @@ public class Installer {
             callback.accept(new StatusCallback(phrase, "Downloading OptiFine", null));
             File tmpDir = java.nio.file.Files.createTempDirectory("Hyperium").toFile();
             try {
-                DownloadTask dl = new DownloadTask("https://raw.githubusercontent.com/HyperiumClient/Hyperium-Repo/master/files/mods/OptiFine_1.8.9_HD_U_I7.jar", tmpDir.getAbsolutePath());
+                DownloadTask dl = new DownloadTask("https://github.com/hyperiumjailbreak/tools/raw/master/OptiFine_1.8.9_HD_U_I7.jar", tmpDir.getAbsolutePath());
                 dl.addPropertyChangeListener(evt -> {
                     if (evt.getNewValue() instanceof Integer) callback.accept(new StatusCallback(Phrase.DOWNLOAD_COMPONENTS, "Downloading OptiFine (" + evt.getNewValue() + "%)", null));
                 });
