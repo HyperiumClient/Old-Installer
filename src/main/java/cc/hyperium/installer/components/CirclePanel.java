@@ -6,13 +6,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
-/*
- * Created by Cubxity on 06/07/2018
- */
 public class CirclePanel extends JPanel {
-    public CirclePanel() {
-
-    }
+    public CirclePanel() {}
 
     @Override
     protected void paintComponent(Graphics g) {
