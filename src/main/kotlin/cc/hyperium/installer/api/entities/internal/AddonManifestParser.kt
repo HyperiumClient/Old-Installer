@@ -8,30 +8,11 @@ import java.io.*
 import java.nio.charset.Charset
 import java.util.jar.JarFile
 
-/**
- * Parses addon.json into a instance of {@link cc.hyperium.installer.api.entities.internal.AddonManifest}
- *
- * @since 1.0
- * @author Kevin Brewster
- */
 class AddonManifestParser {
-
-    /**
-     * Manifest json
-     */
     private var json: JsonObject? = null
 
-    /**
-     * Gson instance
-     */
     private val gson = Gson()
 
-    /**
-     * Used when parsing the addon.json inside of a
-     * jarfile
-     *
-     * @param jar jarfile which the manifest should be read from
-     */
     constructor(jar: JarFile) {
 
         var jarInputStream: InputStream? = null
@@ -63,13 +44,7 @@ class AddonManifestParser {
         }
     }
 
-    /**
-     * Used when parsing an addon.jsons string
-     *
-     * @param contents The addons json (addon.json)
-     */
     constructor(contents: String) {
-        System.out.println(contents)
         val parser = JsonParser()
         val json = parser.parse(contents).asJsonObject
 
@@ -79,18 +54,10 @@ class AddonManifestParser {
         this.json = json
     }
 
-    /**
-     * Gets the AddonManifest instance
-     */
     fun getAddonManifest(): AddonManifest {
         return gson.fromJson(json, AddonManifest::class.java)
     }
 
-    /**
-     * The String of the json
-     *
-     * @return addon manifest json in string
-     */
     override fun toString(): String {
         return json!!.toString()
     }
