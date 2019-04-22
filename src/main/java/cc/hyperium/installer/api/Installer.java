@@ -63,9 +63,6 @@ public class Installer {
 
             boolean mmc = new File(mc, "multimc.cfg").exists();
 
-            InstallerMain.INSTANCE.getLogger().debug("MC Dir = {}", mc.getAbsolutePath());
-            InstallerMain.INSTANCE.getLogger().debug("MultiMC = {}", mmc);
-
             File versions = new File(mc, mmc ? "instances" : "versions");
             File origin = mmc ? new File(mc, "libraries" + sep + "com" + sep + "mojang" + sep + "minecraft" + sep + "1.8.9") : new File(versions, "1.8.9");
             File originJson = new File(origin, "1.8.9.json");
@@ -79,24 +76,21 @@ public class Installer {
             File target = new File(versions, "Hyperium 1.8.9");
 
             File libraries = new File(mc, "libraries");
-            if (!mmc && target.exists())
+            if (!mmc && target.exists()) {
                 try {
                     callback.accept(new StatusCallback(phrase, "Deleting previous files", null));
                     FileUtils.deleteDirectory(target);
-
                 } catch (Exception ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to delete the old files, is the game running?"));
                     return;
                 }
-
-
+            }
             boolean local1 = config.getVersion().getName().equals("LOCAL");
             if (local1) {
                 phrase = Phrase.COPY_VERSION;
                 File local;
 
                 local = new File(InstallerMain.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-                InstallerMain.INSTANCE.getLogger().debug("Local = {}", local.getAbsolutePath());
                 callback.accept(new StatusCallback(phrase, "Copying local jar", local));
                 try {
                     File localLib = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
@@ -109,8 +103,9 @@ public class Installer {
             } else {
                 try {
                     File hyperium = new File(mc, "libraries" + sep + "cc" + sep + "hyperium" + sep + "Hyperium");
-                    if (hyperium.exists())
+                    if (hyperium.exists()) {
                         FileUtils.deleteDirectory(hyperium);
+                    }
                 } catch (IOException ex) {
                     callback.accept(new ErrorCallback(ex, phrase, "Failed to delete old Hyperium libraries"));
                 }
@@ -120,13 +115,13 @@ public class Installer {
                     File dest = new File(libraries, "cc" + sep + "hyperium" + sep + "Hyperium" + sep + config.getVersion().getName() + " (" + config.getVersion().getId() + ")" + sep + "Hyperium-" + config.getVersion().getName() + ".jar");
 
                     File dir = dest.getParentFile();
-                    InstallerMain.INSTANCE.getLogger().debug("Target directory: {}", dir.getAbsolutePath());
                     dir.mkdirs();
 
                     DownloadTask dl = new DownloadTask(config.getVersion().getUrl(), dir.getAbsolutePath());
                     dl.addPropertyChangeListener(evt -> {
-                        if (evt.getNewValue() instanceof Integer)
+                        if (evt.getNewValue() instanceof Integer) {
                             callback.accept(new StatusCallback(Phrase.DOWNLOAD_CLIENT, evt.getNewValue() + "% Downloaded", null));
+                        }
                     });
                     dl.execute();
                     dl.get();
