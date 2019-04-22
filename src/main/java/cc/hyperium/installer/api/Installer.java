@@ -199,7 +199,7 @@ public class Installer {
 
             try {
                 phrase = Phrase.PATCH_OPTIFINE;
-                callback.accept(new StatusCallback(phrase, "Patching Optifine", null));
+                callback.accept(new StatusCallback(phrase, "Patching OptiFine", null));
                 File optifineLibDir = new File(libraries, sep + "optifine" + sep + "OptiFine" + sep + "1.8.9_HD_U_I7");
                 optifineLibDir.mkdirs();
                 File optifineLib = new File(optifineLibDir, "OptiFine-1.8.9_HD_U_I7.jar");
