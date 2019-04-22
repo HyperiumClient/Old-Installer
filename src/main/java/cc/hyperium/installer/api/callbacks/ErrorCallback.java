@@ -23,8 +23,4 @@ public class ErrorCallback extends AbstractCallback {
     public Exception getError() {
         return error;
     }
-
-    public Phrase getPhrase() {
-        return phrase;
-    }
 }

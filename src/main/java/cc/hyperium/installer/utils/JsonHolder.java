@@ -18,18 +18,14 @@
 package cc.hyperium.installer.utils;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
 public class JsonHolder {
     private JsonObject object = new JsonObject();
-    private boolean parsedCorrectly = true;
 
     public JsonHolder(JsonObject object) {
         this.object = object;
@@ -44,17 +40,12 @@ public class JsonHolder {
             this.object = new JsonParser().parse(raw).getAsJsonObject();
         } catch (Exception e) {
             this.object = new JsonObject();
-            this.parsedCorrectly = false;
             e.printStackTrace();
         }
     }
 
     public JsonHolder() {
         this(new JsonObject());
-    }
-
-    public boolean isParsedCorrectly() {
-        return parsedCorrectly;
     }
 
     @Override
@@ -69,42 +60,12 @@ public class JsonHolder {
         return this;
     }
 
-    public void mergeNotOverride(JsonHolder merge) {
-        merge(merge, false);
-    }
-
-    public void mergeOverride(JsonHolder merge) {
-        merge(merge, true);
-    }
-
-    public void merge(JsonHolder merge, boolean override) {
-        JsonObject object = merge.getObject();
-        for (String s : merge.getKeys()) {
-            if (override || !this.has(s))
-                put(s, object.get(s));
-        }
-    }
-
-    private void put(String s, JsonElement element) {
-        this.object.add(s, element);
-    }
-
     public JsonHolder put(String key, String value) {
         object.addProperty(key, value);
         return this;
     }
 
     public JsonHolder put(String key, int value) {
-        object.addProperty(key, value);
-        return this;
-    }
-
-    public JsonHolder put(String key, double value) {
-        object.addProperty(key, value);
-        return this;
-    }
-
-    public JsonHolder put(String key, long value) {
         object.addProperty(key, value);
         return this;
     }
@@ -133,18 +94,6 @@ public class JsonHolder {
         return object.has(key);
     }
 
-    public long optLong(String key, long fallback) {
-        try {
-            return object.get(key).getAsLong();
-        } catch (Exception e) {
-            return fallback;
-        }
-    }
-
-    public long optLong(String key) {
-        return optLong(key, 0);
-    }
-
     public boolean optBoolean(String key, boolean fallback) {
         try {
             return object.get(key).getAsBoolean();
@@ -157,28 +106,8 @@ public class JsonHolder {
         return optBoolean(key, false);
     }
 
-    public JsonObject optActualJSONObject(String key) {
-        try {
-            return object.get(key).getAsJsonObject();
-        } catch (Exception e) {
-            return new JsonObject();
-        }
-    }
-
     public JsonHolder optJSONObject(String key) {
         return optJSONObject(key, new JsonObject());
-    }
-
-    public int optInt(String key, int fallBack) {
-        try {
-            return object.get(key).getAsInt();
-        } catch (Exception e) {
-            return fallBack;
-        }
-    }
-
-    public int optInt(String key) {
-        return optInt(key, 0);
     }
 
     public String optString(String key, String fallBack) {
@@ -193,28 +122,12 @@ public class JsonHolder {
         return optString(key, "");
     }
 
-    public double optDouble(String key, double fallBack) {
-        try {
-            return object.get(key).getAsDouble();
-        } catch (Exception e) {
-            return fallBack;
-        }
-    }
-
     public List<String> getKeys() {
         return object.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
-    public double optDouble(String key) {
-        return optDouble(key, 0.0);
-    }
-
     public JsonObject getObject() {
         return object;
-    }
-
-    public boolean isNull(String key) {
-        return object.has(key) && object.get(key).isJsonNull();
     }
 
     public JsonHolder put(String values, JsonHolder values1) {
@@ -229,19 +142,5 @@ public class JsonHolder {
     public JsonHolder put(String key, JsonArray value) {
         this.object.add(key, value);
         return this;
-    }
-
-    public void remove(String header) {
-        object.remove(header);
-    }
-
-    public List<String> getJsonArrayAsStringList(String root) {
-        List<String> strings = new ArrayList<>();
-        try {
-            for (JsonElement element : object.get(root).getAsJsonArray()) {
-                strings.add(element.getAsString());
-            }
-        } catch (Exception ignored) {}
-        return strings;
     }
 }

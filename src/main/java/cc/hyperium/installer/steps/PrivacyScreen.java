@@ -29,13 +29,10 @@ public class PrivacyScreen extends InstallerStep {
         c.add(text);
 
         JTextArea essay = new JTextArea("Privacy Policy\n\n\n" +
-                "What data does Hyperium Collect?" +
-                "\n" +
-                "When using Hyperium, the client and integrated mods send a few small pieces of information to a remote server in exchange for a temporary token for accessing data from Hypixel. This information includes your Minecraft UUID and username, Minecraft Version, Client Version and specific mod being used. This information is processed and used to determine if the client is out of date or if the client should abort the startup procedure.\n\n" +
-                "What we do with the data?\n" +
-                "\n" +
-                "The data is stored securely for analytic purposes. We will never sell or release the data collected from specific users. All analytic graphs may be viewed on sk1er.club/graphs/hyperium\nHyperium may also collect the servers you play on and the duration of time spent on servers.\n" +
-                "Last updated: August 19th, 2018\n");
+                "HYPERIUMJAILBREAK TRIES TO PROTECT YOUR PRIVACY.\n\n" +
+                "What data do we collect?\n" +
+                "When using HyperiumJailbreak, some data is sent to different servers for certain mods and features to work. The data is stored securely and not displayed publicly. This data includes your UUID, Autotip statistics, and other minor details like that.\n\n" +
+                "Last updated: April 22nd, 2019\n");
         essay.setLineWrap(true);
         essay.setWrapStyleWord(true);
         essay.setFont(InstallerMain.INSTANCE.getFont());
@@ -59,7 +56,7 @@ public class PrivacyScreen extends InstallerStep {
         UIManager.put("ScrollBar.width", 5);
 
         JButton next = new FlatButton();
-        next.setText("Accept and continue");
+        next.setText("Okay!");
         next.setBounds(c.getWidth() / 2 - 100, c.getHeight() - 40, 200, 22);
         next.addActionListener(e -> InstallerMain.INSTANCE.next());
         c.add(next);

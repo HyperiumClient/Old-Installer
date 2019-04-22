@@ -36,11 +36,8 @@ import java.util.jar.JarFile;
 
 public class Installer {
     public static final int API_VERSION = 4;
-
     private final InstallerConfig config;
-
     private Consumer<AbstractCallback> callback;
-
     private int code = 1;
 
     public Installer(InstallerConfig config, Consumer<AbstractCallback> callback) {
@@ -478,10 +475,6 @@ public class Installer {
             phrase = Phrase.DONE;
             callback.accept(new StatusCallback(phrase, "Installation success! Launch from your " + (mmc ? "MultiMC" : "Minecraft") + " launcher.", null));
             code = 0;
-
-            if (!InstallerMain.INSTANCE.getLaunchCommand().isEmpty()) {
-                InstallerMain.INSTANCE.launchMinecraft();
-            }
         } catch (Exception ex) {
             callback.accept(new ErrorCallback(ex, phrase));
         }

@@ -2,7 +2,6 @@ package cc.hyperium.installer.steps;
 
 import cc.hyperium.installer.InstallerMain;
 import cc.hyperium.installer.components.FlatButton;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -13,9 +12,6 @@ import java.awt.Container;
 import java.awt.Image;
 import java.io.IOException;
 
-/*
- * Created by Cubxity on 05/07/2018
- */
 public class WelcomeScreen extends InstallerStep {
     @Override
     public void addComponents(Container c) {
@@ -30,7 +26,7 @@ public class WelcomeScreen extends InstallerStep {
         }
         icon.setBounds(c.getWidth() / 2 - w / 2, w / 4, w, w);
 
-        JLabel text = new JLabel("Hyperium Installer", SwingConstants.CENTER);
+        JLabel text = new JLabel("HyperiumJailbreak Installer", SwingConstants.CENTER);
         text.setFont(InstallerMain.INSTANCE.getTitle());
         text.setForeground(Color.WHITE);
         text.setBounds(0, w / 4 + w + 10, c.getWidth(), 60);

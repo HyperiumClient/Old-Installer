@@ -10,7 +10,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
 public class FlatRadioButton extends JRadioButton {
-
     private static final BufferedImage unselectedButtonImage;
     private static final BufferedImage selectedButtonImage;
     private static final BufferedImage disabledButtonImage;

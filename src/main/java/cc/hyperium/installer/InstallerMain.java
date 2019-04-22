@@ -22,8 +22,6 @@ import java.awt.FontFormatException;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayDeque;
@@ -37,8 +35,6 @@ public class InstallerMain {
     public static final InstallerMain INSTANCE = new InstallerMain();
     private final Queue<InstallerStep> steps = new ArrayDeque<>();
     private final Logger logger = LoggerFactory.getLogger("Installer");
-    private final StringBuilder log = new StringBuilder();
-    public String launchCommand = "";
     private InstallerConfig config;
     private JFrame frame;
     private Font title;
@@ -47,81 +43,14 @@ public class InstallerMain {
     public static void main(String... args) {
         if (args.length >= 1) {
             boolean local = args[0].equalsIgnoreCase("local");
-
-            boolean forward = args[0].equalsIgnoreCase("fw");
-            StringBuilder fwCmd = new StringBuilder();
-            if (args.length >= 2)
-                for (int i = 1; i < args.length; i++)
-                    fwCmd.append(args[i]).append(" ");
-            if (forward) {
-                // Installer has been called from the client.
-                INSTANCE.setLaunchCommand(fwCmd.toString());
-                INSTANCE.fastInstall(true);
-            } else {
-                // Installer has been called from the command line.
-                INSTANCE.init(local);
-            }
+            INSTANCE.init(local);
         } else {
             // Conventional installation.
             INSTANCE.init(false);
         }
     }
 
-    private void fastInstall(boolean local) {
-        loadPreviousConfig();
-
-        if (local) {
-            config.setVersion(new VersionManifest("LOCAL", 0, "cc.hyperium:Hyperium:LOCAL", "", "", 0, 0, false, Installer.API_VERSION));
-        } else {
-            config.setVersion(InstallerUtils.getManifest().getLatest());
-        }
-        try {
-            font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/segoeuil.ttf")).deriveFont(15f);
-        } catch (FontFormatException | IOException e) {
-            e.printStackTrace();
-            font = new Font("Arial", Font.PLAIN, 15);
-        }
-
-        title = font.deriveFont(50f);
-
-        // Start installing phase immediately.
-        logger.info("Beginning installation...");
-        initFrame();
-        renderStep(new InstallingScreen());
-    }
-
-    public void launchMinecraft() {
-        Thread launchThread = new Thread(() -> {
-            try {
-                Runtime.getRuntime().exec(INSTANCE.getLaunchCommand());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        launchThread.start();
-        System.exit(0);
-    }
-
-    public String getLaunchCommand() {
-        return launchCommand;
-    }
-
-    public void setLaunchCommand(String launchCommand) {
-        this.launchCommand = launchCommand;
-    }
-
     private void init(boolean local) {
-        final PrintStream ps = System.out;
-        final PrintStream logStream = new PrintStream(new OutputStream() {
-            @Override
-            public void write(int b) {
-                ps.write(b);
-                log.append((char) b);
-            }
-        });
-        System.setOut(logStream);
-        System.setErr(logStream);
-
         AtomicBoolean pass = new AtomicBoolean(false);
         Multithreading.runAsync(() -> {
             InstallerUtils.getManifest();
@@ -233,9 +162,5 @@ public class InstallerMain {
 
     public Logger getLogger() {
         return logger;
-    }
-
-    public StringBuilder getLog() {
-        return log;
     }
 }
