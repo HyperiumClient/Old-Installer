@@ -2,4 +2,4 @@ task:
   name: Cirrus CI
   container:
     image: maven:3-jdk-8
-  test_script: mvn build
+  test_script: mvn compile
